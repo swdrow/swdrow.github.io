@@ -12,6 +12,7 @@ framestr = frame.to_html()
 template_file = "Data/Templates/Test.jinja"
 env = Environment(loader=PackageLoader("Data", 'templates'))
 template = env.get_template("Test.jinja")
+framestr = f"<h1> Hi Ella! </h1>"
 context = {
     "table": framestr
 }
