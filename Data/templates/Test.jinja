@@ -1,41 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <title>SDuncan</title>
+  <title>SDuncan</title>
 </head>
 <style>
   .tablink {
-  background-color: #555;
-  color: white;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
-  font-size: 17px;
-  width: 25%;
-}
+    background-color: #555;
+    color: white;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    font-size: 17px;
+    width: 25%;
+  }
 
-.tablink:hover {
-  background-color: #777;
-}
+  .tablink:hover {
+    background-color: #777;
+  }
 
-/* Style the tab content (and add height:100% for full page content) */
-.tabcontent {
-  color: white;
-  display: none;
-  padding: 100px 20px;
-  height: 100%;
-}
+  /* Style the tab content (and add height:100% for full page content) */
+  .tabcontent {
+    color: white;
+    display: none;
+    padding: 0px 20px;
+    height: 100%;
+    overflow-y: scroll;
+  }
 
-#Home {background-color: red;}
-#News {background-color: green;}
-#Contact {background-color: blue;}
-#About {background-color: orange;}
+  table {
+    margin-inline: auto;
+    border-collapse: separate;
+    border-spacing: 0px 10px;
+  }
+
+  table th {
+    background-color: rgb(245, 208, 61);
+    color: royalblue;
+    border: solid 3px;
+    border-left: none;
+    border-right: none;
+    border-color: navy;
+    color: navy;
+  }
+
+  table th:first-child {
+    border-left: solid 3px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-right: none;
+  }
+
+  table th:last-child {
+    border-right: solid 3px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    text-align: center;
+  }
+
+  table td {
+    border: solid 3px;
+    border-color: navajowhite;
+    border-left: none;
+    border-right: none;
+    padding: 16px 14px;
+    border-spacing: 0 0px;
+    text-align: center;
+  }
+
+  table td:first-child {
+    border-left: solid 3px;
+    border: solid 3px;
+    border-color: navajowhite;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-right: none;
+  }
+
+  table td:last-child {
+    border-right: solid 3px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  body {
+    background-color: lightslategray;
+  }
+
+  #Home {
+    background-image: linear-gradient(180deg, rgba(255, 0, 0, 1), rgba(255, 0, 0, 0));
+  }
+
+  #Drexel {
+    <!-- background-image: url("AdobeStock_666396000.jpeg"); -->
+    background-color: steelblue;
+    background-size: contain;
+  }
+
+  #Contact {
+    background-color: green;
+  }
+
+  #About {
+    background-color: orange;
+  }
 </style>
 <button class="tablink" onclick="openPage('Home', this, 'red')">Home</button>
-<button class="tablink" onclick="openPage('News', this, 'green')" id="defaultOpen">News</button>
-<button class="tablink" onclick="openPage('Contact', this, 'blue')">Contact</button>
+<button class="tablink" onclick="openPage('Drexel', this, 'steelblue')" id="defaultOpen">Drexel</button>
+<button class="tablink" onclick="openPage('Contact', this, 'green')">Contact</button>
 <button class="tablink" onclick="openPage('About', this, 'orange')">About</button>
 
 <div id="Home" class="tabcontent">
@@ -44,14 +118,13 @@
   <p>Home is where the heart is..</p>
 </div>
 
-<div id="News" class="tabcontent">
-  <h3>News</h3>
-  <p>Some news this fine day!</p>
+<div id="Drexel" class="tabcontent">
+  <h3>2k Records</h3>
+  {{table}}
 </div>
 
 <div id="Contact" class="tabcontent">
-  <h3>Contact</h3>
-  <p>Get in touch, or swing by for a cup of coffee.</p>
+  <h3>Idk Dawg</h3>
 </div>
 
 <div id="About" class="tabcontent">
@@ -59,4 +132,8 @@
   <p>Who we are and what we do.</p>
 </div>
 <script type="text/javascript" src="js/scripts.js"></script>
+<script>
+  windowH()
+</script>
+
 </html>
