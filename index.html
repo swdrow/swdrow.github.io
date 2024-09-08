@@ -3,6 +3,7 @@
 
 <head>
   <title>SDuncan</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <style>
   .tablink {
@@ -27,7 +28,6 @@
     display: none;
     padding: 0px 20px;
     height: 100%;
-    overflow-y: scroll;
   }
 
   .fade {
@@ -37,18 +37,21 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0));
   }
   
   table {
     margin-inline: auto;
     border-collapse: separate;
     border-spacing: 0px 10px;
+    scroll-behavior: smooth;
   }
 
   table tr {
     background: linear-gradient(180deg, rgba(255, 0, 0, 1), rgba(255, 0, 0, 0));
   }
+
+ 
 
   table th {
     background-color: rgb(245, 208, 61);
@@ -120,6 +123,8 @@
   #About {
     background-color: orange;
   }
+
+  
 </style>
 <button class="tablink" onclick="openPage('Home', this, 'red')">Home</button>
 <button class="tablink" onclick="openPage('Drexel', this, 'steelblue')" id="defaultOpen">Drexel</button>
@@ -132,7 +137,45 @@
   <p>Home is where the heart is..</p>
 </div>
 
-<div id="Drexel" class="tabcontent" class="fade">
+<script>
+  window.addEventListener('scroll', function() {
+    // Get the current scroll position
+    var scrollPosition = window.pageYOffset;
+
+    // Calculate the top 10% and bottom 10% of the visible area
+    var topTenPercent = window.innerHeight * 0.1;
+    var bottomTenPercent = window.innerHeight * 0.9;
+
+    // Select all table rows
+    var rows = document.querySelectorAll('table tr');
+
+    // Iterate over each row
+    rows.forEach(function(row) {
+        // Get the row's position relative to the top of the document
+        var rowPosition = row.getBoundingClientRect().top + scrollPosition;
+
+        // Check if the row is within the top 10% or bottom 10% of the visible area
+        if (rowPosition >= scrollPosition && rowPosition <= scrollPosition + topTenPercent) {
+            // Calculate the row's opacity based on its position within the top 10%
+            var opacity = ((rowPosition - scrollPosition ) / topTenPercent);
+
+            // Set the row's opacity
+            row.style.opacity = opacity;
+        } else if (rowPosition >= scrollPosition + bottomTenPercent && rowPosition <= scrollPosition + window.innerHeight) {
+            // Calculate the row's opacity based on its position within the bottom 10%
+            var opacity = ((scrollPosition + window.innerHeight - rowPosition) / topTenPercent);
+
+            // Set the row's opacity
+            row.style.opacity = opacity;
+        } else {
+            // Reset the row's opacity if it's not within the top 10% or bottom 10%
+            row.style.opacity = 1;
+        }
+    });
+});
+</script>
+
+<div id="Drexel" class="tabcontent">
   <h3>2k Records</h3>
   <style type="text/css">
   #T_18061 th {
@@ -991,18 +1034,5 @@
 <script type="text/javascript" src="js/scripts.js"></script>
 <script>
   windowH()
-</script>
-<script>
-  const container = document.querySelector('.tabcontent');
-  const fade = document.querySelector('.fade');
-
-  container.addEventListener('scroll', () => {
-      const scrollTop = container.scrollTop;
-      const scrollHeight = container.scrollHeight;
-      const clientHeight = container.clientHeight;
-
-      const opacity = Math.min(scrollTop / (scrollHeight - clientHeight), 1);
-      fade.style.background = `linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, ${opacity}))`;
-  });
 </script>
 </html>
