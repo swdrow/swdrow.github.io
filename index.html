@@ -12,8 +12,44 @@
     <link href="css/templatemo-diagoona.css" rel="stylesheet" />
 </head>
 <style>
+  .tm-bg {
+    min-height: 100%; /* 100% of the viewport height */
+    display: flex;
+}
   a.tm-nav-link {
       z-index: 13;
+  }
+  .tm-content-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 110px; /* Adjust height as needed */
+}
+  .tm-content button {
+    padding: 10px 20px;
+    font-size: 10px;
+    background-color: #0a509b;
+    opacity: 1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: right;
+    text-align: center;
+    margin-left: 100;
+    background: linear-gradient(to right, #007BFF 100%, #d6d6d6 0%);
+    background-repeat: no-repeat;
+    transition: background 0.2s;
+  }
+  .tm-content button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+  }
+  button:hover:not(:disabled) {
+    background-color: #0056b3;
   }
 </style>
 <body>
@@ -67,7 +103,7 @@
                         <p class="mb-5"></p>
                         <hr class="mb-5">
                         <h2 class="mb-5 tm-content-title" >RIVER DATA</h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 113">
+                        <svg class="river-data-svg"xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 113">
                             <defs>
                               <style>
                                 
@@ -132,19 +168,19 @@
                               </style>
                             </defs>
                                 <g>
-                                  <text class="cls-5" transform="translate(390 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle" font-family="access-mn, sans-serif" font-style="normal" font-weight="500">HEIGHT</text>
-                                  <text class="cls-4" transform="translate(390 68.91)" id="R-Height" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">HEIGHT</text>
+                                  <text class="cls-5" transform="translate(390 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle" font-family="access-mn, sans-serif" font-style="normal" font-weight="500">HEIGHT</text>
+                                  <text class="cls-4" transform="translate(390 45)" id="R-Height" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">HEIGHT</text>
                                 </g>
                                 <g>
-                                  <text class="cls-5" transform="translate(225 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">WATER TEMP</text>
-                                  <text class="cls-4" transform="translate(225 68.91)" id="R-Temp" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">TEMP</text>
+                                  <text class="cls-5" transform="translate(225 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">WATER TEMP</text>
+                                  <text class="cls-4" transform="translate(225 45)" id="R-Temp" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">TEMP</text>
                                 </g>
                                 <g>
-                                  <text class="cls-5" transform="translate(55 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DISCHARGE</text>
-                                  <text class="cls-4" transform="translate(55 68.91)" id="R-Discharge" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DISCHARGE</text>
+                                  <text class="cls-5" transform="translate(55 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DISCHARGE</text>
+                                  <text class="cls-4" transform="translate(55 45)" id="R-Discharge" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DISCHARGE</text>
                                 </g>
                           </svg>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 113">
+                          <svg class="wind-data-svg"xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 113">
                             <defs>
                               <style>
                                 
@@ -209,18 +245,22 @@
                               </style>
                             </defs>
                                 <g>
-                                  <text class="cls-5" transform="translate(390 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle" font-family="access-mn, sans-serif" font-style="normal" font-weight="500">Wind Speed</text>
-                                  <text class="cls-4" transform="translate(390 68.91)" id="R-WindSpeed" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Wind Speed</text>
+                                  <text class="cls-5" transform="translate(390 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle" font-family="access-mn, sans-serif" font-style="normal" font-weight="500">Wind Speed</text>
+                                  <text class="cls-4" transform="translate(390 45)" id="R-WindSpeed" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Wind Speed</text>
                                 </g>
                                 <g>
-                                  <text class="cls-5" transform="translate(225 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">GUSTS</text>
-                                  <text class="cls-4" transform="translate(225 68.91)" id="R-Gusts" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Gusts</text>
+                                  <text class="cls-5" transform="translate(225 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">GUSTS</text>
+                                  <text class="cls-4" transform="translate(225 45)" id="R-Gusts" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Gusts</text>
                                 </g>
                                 <g>
-                                  <text class="cls-5" transform="translate(55 44.52)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DIRECTION</text>
-                                  <text class="cls-4" transform="translate(55 68.91)" id="R-Direction" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Direction</text>
+                                  <text class="cls-5" transform="translate(55 20)" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">DIRECTION</text>
+                                  <text class="cls-4" transform="translate(55 45)" id="R-Direction" x="5%" y="0" text-anchor="middle" dominant-baseline="middle">Direction</text>
                                 </g>
                           </svg>
+                          <div class="tm-content-button">
+                            <button id="fetchButton">Fetch Current Wind Data</button>
+                          </div>
+
                     </section>
                 </main>
             </div>
@@ -263,6 +303,128 @@
       getAverageWindDataBoathouseRow()
     
     
+    </script>
+    <script>
+      async function getCurrentWindDataHr(lat, lon) {
+        try {
+            // Step 1: Get the nearest observation station
+            const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+            if (!pointResponse.ok) throw new Error('Failed to fetch station information');
+            const pointData = await pointResponse.json();
+            const stationUrl = pointData.properties.observationStations;
+    
+            // Step 2: Fetch the nearest station's data
+            const stationListResponse = await fetch(stationUrl);
+            if (!stationListResponse.ok) throw new Error('Failed to fetch station list');
+            const stationList = await stationListResponse.json();
+            const nearestStation = stationList.features[0].id; // Get the first station
+    
+            // Step 3: Fetch the latest observation from the nearest station
+            const observationResponse = await fetch(`${nearestStation}/observations/latest`);
+            if (!observationResponse.ok) throw new Error('Failed to fetch latest observation');
+            const observationData = await observationResponse.json();
+    
+            // Step 4: Extract wind data
+            const windSpeed = observationData.properties.windSpeed.value; // in m/s
+            const windGust = observationData.properties.windGust?.value; // in m/s
+            const windDirection = observationData.properties.windDirection.value; // in degrees
+    
+            // Convert wind speed to km/h
+            const windSpeedKmH = windSpeed ? (windSpeed * 3.6).toFixed(2) : null;
+            const windGustKmH = windGust ? (windGust * 3.6).toFixed(2) : null;
+    
+            console.log(`Wind Speed: ${windSpeedKmH || 'N/A'} km/h`);
+            console.log(`Wind Gust: ${windGustKmH || 'N/A'} km/h`);
+            console.log(`Wind Direction: ${windDirection || 'N/A'}°`);
+    
+            return { windSpeed: windSpeedKmH, windGust: windGustKmH, windDirection };
+        } catch (error) {
+            console.error('Error fetching current wind data:', error);
+            return { windSpeed: null, windGust: null, windDirection: null };
+        }
+    }
+    
+    // Call the function with coordinates for Boathouse Row, Philadelphia
+    getCurrentWindDataHr(39.9676, -75.1834);
+    </script>
+    <script>
+      async function getCurrentWindData() {
+        const apiUrl = "https://api.open-meteo.com/v1/forecast?latitude=39.9696&longitude=-75.1876&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=uv_index&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York";
+        const latitude = 39.9696; // Latitude for Boathouse Row, Philadelphia
+        const longitude = -75.1876; // Longitude for Boathouse Row, Philadelphia
+        const parameters = [
+            "current_weather=true",
+            "latitude=" + latitude,
+            "longitude=" + longitude,
+            "wind_speed_unit=mph", // Use mph as the wind speed unit
+            "timezone=America/New_York"
+        ];
+    
+        try {
+            // Construct the full API URL with parameters
+            const url = `${apiUrl}`;
+            
+            // Fetch data from the API
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Failed to fetch wind data");
+    
+            // Parse the JSON response
+            const data = await response.json();
+            console.log(data);
+            // Extract current weather details
+            const currentWeather = data.current;
+            const windSpeed = currentWeather.wind_speed_10m; // Wind speed in mph
+            const windGust = currentWeather.wind_gusts_10m || "N/A"; // Wind gusts in mph, if available
+            const windDirection = currentWeather.wind_direction_10m || "N/A";
+            
+            console.log(`Wind Direction: ${windDirection || 'N/A'}°`);
+            console.log(`Current Wind Speed: ${windSpeed} mph`);
+            console.log(`Current Wind Gust Speed: ${windGust} mph`);
+            document.getElementById("R-WindSpeed").textContent = `${windSpeed} mph`;
+            document.getElementById("R-Gusts").textContent = `${windGust || 'N/A'} mph`;
+            document.getElementById("R-Direction").textContent = `${windDirection || 'N/A'}°`;
+            return { windSpeed, windGust };
+        } catch (error) {
+            console.error("Error fetching wind data:", error);
+            return { windSpeed: null, windGust: null };
+        }
+    }
+
+    function handleCooldown(button, cooldownTime) {
+      let remainingTime = cooldownTime;
+      const totalTime = cooldownTime;
+
+      // Disable the button
+      button.disabled = true;
+
+      const interval = setInterval(() => {
+          remainingTime--;
+
+          // Calculate percentage filled
+          const percentage = ((totalTime - remainingTime) / totalTime) * 100;
+
+          // Update the button's background gradient
+          button.style.background = `linear-gradient(to right, #007BFF ${percentage}%, #d6d6d6 ${percentage}%)`;
+
+          if (remainingTime <= 0) {
+              clearInterval(interval);
+              button.disabled = false;
+              button.style.background = "linear-gradient(to right, #007BFF 100%, #007BFF 100%)";
+              button.textContent = "Fetch Current Wind Data";
+          } else {
+              button.textContent = `Cooldown: ${remainingTime}s`;
+          }
+      }, 1000);
+  }
+
+  // Add event listener to the button
+  const fetchButton = document.getElementById("fetchButton");
+  fetchButton.addEventListener("click", () => {
+      getCurrentWindData();
+      handleCooldown(fetchButton, 300); // 300 seconds = 5 minutes
+  });
+    // Call the function to get the current wind data
+    <!-- getCurrentWindData(); -->
     </script>
 </body>
 </html>
