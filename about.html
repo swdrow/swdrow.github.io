@@ -18,7 +18,11 @@ https://templatemo.com/tm-550-diagoona
 
 -->
 </head>
-
+<style>
+    a.tm-nav-link {
+        z-index: 1;
+    }
+</style>
 <body>
     <div class="tm-container">        
         <div>
@@ -45,7 +49,7 @@ https://templatemo.com/tm-550-diagoona
                                     <a class="nav-link tm-nav-link" href="index.html">Home</a>
                                 </li>
                                 <li class="nav-item active">
-                                    <a class="nav-link tm-nav-link" href="about.html">About <span class="sr-only">(current)</span></a>
+                                    <a class="nav-link tm-nav-link" href="about.html">Weather<span class="sr-only">(current)</span></a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link tm-nav-link" href="services.html">Services</a>
@@ -60,34 +64,42 @@ https://templatemo.com/tm-550-diagoona
             </div>
             
             <div class="tm-row">
-                <div class="tm-col-left"></div>
-                <main class="tm-col-right">
-                    <section class="tm-content tm-about">
-                        <h2 class="mb-5 tm-content-title">About Diagoona Template</h2>
-                        <hr class="mb-4">
-                        <div class="media my-3">
-                            <i class="fas fa-shapes fa-3x p-3 mr-4"></i>
-                            <div class="media-body">
-                                <p>Cras quam urna, interdum at posuere ac, tincidunt ut ipsum. Nam condimentum placerat enim. Nullam euismod sapien.</p>
-                            </div> 
-                        </div>
-                        <div class="media my-3">
-                            <i class="fas fa-draw-polygon fa-3x p-3 mr-4"></i>
-                            <div class="media-body">
-                                <p>Nunc id hendrerit nunc. Etiam ultricies arcu sem, vel dapibus lacus lacinia quis. Nunc auctor placerat nisi ac ultrices.</p>
-                            </div> 
-                        </div>
-                        <div class="media my-3">
-                            <i class="fab fa-creative-commons-share fa-3x p-3 mr-4"></i>
-                            <div class="media-body">
-                                <p>Vestibulum imperdiet hendrerit nibh. Integer sit amet lacus et nunc auctor tincidunt eu ac sapien. Ut suscipit velit eget faucibus finibus.</p>
-                            </div> 
-                        </div>
-                        <div class="media my-3">
-                            <i class="fas fa-bookmark fa-3x p-3 mr-4"></i>
-                            <div class="media-body">
-                                <p>Prasent eget enim vitae sapien egestas aliquet non quis neque. Duis pharetra varius massa, ut bibendum tortor sodales ac.</p>
-                            </div> 
+  <div class="tm-col-left"></div>
+  <main class="tm-col-right">
+    <section class="tm-content tm-about">
+      <h2 class="mb-5 tm-content-title">About Diagoona Template</h2>
+      <hr class="mb-4" />
+
+      <div
+        data-windywidget="forecast"
+        data-thememode="dark"
+        data-tempunit="F"
+        data-windunit="mph"
+        data-spotid="2670235"
+        data-mode="full"
+        data-days="2"
+        data-highcolor="green"
+        data-lowcolor="blue"
+        data-appid="widgets_a274d5ecb5"
+      ></div>
+      <script
+        async="true"
+        data-cfasync="false"
+        type="text/javascript"
+        src="https://windy.app/widgets-code/forecast/windy_forecast_async.js?v149"
+      ></script>
+      <div
+    data-windywidget="map"
+    data-spotid="2670235"
+    data-appid="0143d38c2d0241ae9bc7bef5030836b6"
+    data-spots="true">
+</div>
+<script async="true" data-cfasync="false" type="text/javascript" src="https://windy.app/widget3/windy_map_async.js"></script>
+    </section>
+  </main>
+</div>
+
+
                         </div>                        
                     </section>
                 </main>
