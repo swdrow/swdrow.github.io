@@ -27,7 +27,7 @@ function windowH() {
   var wH = $(window).height();
 
   $('.tabcontent').css({ height: wH });
-}
+};
 
 windowH();
 
@@ -78,7 +78,7 @@ async function fetchWaterData() {
       document.getElementById("R-Temp").textContent = "Error";
       document.getElementById("R-Discharge").textContent = "Error";
   }
-}
+};
 
 async function getAverageWindDataBoathouseRow() {
   const lat = 39.9696; // Latitude for Boathouse Row, Philadelphia
