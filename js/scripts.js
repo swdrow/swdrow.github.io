@@ -246,7 +246,7 @@ async function getCurrentWindData () {
     document.getElementById('R-Direction').textContent = `${
       windDirection || 'N/A'
     }°`
-    animateArrow(windDirection)
+    animateArrow(windDirection+90)
     return { windSpeed, windGust }
   } catch (error) {
     console.error('Error fetching wind data:', error)
