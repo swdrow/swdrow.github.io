@@ -147,80 +147,6 @@ async function getAverageWindDataBoathouseRow() {
 }
 
 const arrow = document.getElementById("arrow");
-async function getCurrentWindData () {
-  const apiUrl =
-    'https://api.open-meteo.com/v1/forecast?latitude=39.9696&longitude=-75.1876&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=uv_index&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York'
-  const latitude = 39.9696 // Latitude for Boathouse Row, Philadelphia
-  const longitude = -75.1876 // Longitude for Boathouse Row, Philadelphia
-  const parameters = [
-    'current_weather=true',
-    'latitude=' + latitude,
-    'longitude=' + longitude,
-    'wind_speed_unit=mph', // Use mph as the wind speed unit
-    'timezone=America/New_York'
-  ]
-
-  try {
-    // Construct the full API URL with parameters
-    const url = `${apiUrl}`
-
-    // Fetch data from the API
-    const response = await fetch(url)
-    if (!response.ok) throw new Error('Failed to fetch wind data')
-
-    // Parse the JSON response
-    const data = await response.json()
-    console.log(data)
-    // Extract current weather details
-    const currentWeather = data.current
-    const windSpeed = currentWeather.wind_speed_10m // Wind speed in mph
-    const windGust = currentWeather.wind_gusts_10m || 'N/A' // Wind gusts in mph, if available
-    const windDirection = currentWeather.wind_direction_10m || 'N/A'
-
-    console.log(`Wind Direction: ${windDirection || 'N/A'}°`)
-    console.log(`Current Wind Speed: ${windSpeed} mph`)
-    console.log(`Current Wind Gust Speed: ${windGust} mph`)
-    document.getElementById('R-WindSpeed').textContent = `${windSpeed} mph`
-    document.getElementById('R-Gusts').textContent = `${windGust || 'N/A'} mph`
-    document.getElementById('R-Direction').textContent = `${
-      windDirection || 'N/A'
-    }°`
-    return { windSpeed, windGust }
-  } catch (error) {
-    console.error('Error fetching wind data:', error)
-    return { windSpeed: null, windGust: null }
-  }
-}
-
-function handleCooldown (button, cooldownTime) {
-  let remainingTime = cooldownTime
-  const totalTime = cooldownTime
-
-  // Disable the button
-  button.disabled = true
-
-  const interval = setInterval(() => {
-    remainingTime--
-
-    // Calculate percentage filled
-    const percentage = ((totalTime - remainingTime) / totalTime) * 100
-
-    // Update the button's background gradient
-    button.style.background = `linear-gradient(to right, #007BFF ${percentage}%, #d6d6d6 ${percentage}%)`
-
-    if (remainingTime <= 0) {
-      clearInterval(interval)
-      button.disabled = false
-      button.style.background =
-        'linear-gradient(to right, #007BFF 100%, #007BFF 100%)'
-      button.textContent = 'Fetch Current Wind Data'
-    } else {
-      button.textContent = `Cooldown: ${remainingTime}s`
-    }
-  }, 1000)
-}
-
-
 function setRotation(angle) {
   let arrow = document.getElementById("arrow");
   arrow.setAttribute(
@@ -262,15 +188,18 @@ function animateArrow(targetAngle) {
 
   function startAnimation() {
     // Phase 1: Initial 360-degree counterclockwise spin at a constant rate
-    animatePhase(currentAngle, currentAngle-1.5*fullRotation, 2000, t => t, (newAngle) => {
+    animatePhase(currentAngle, currentAngle-3*fullRotation, 1500, easeInOutQuad, (newAngle) => {
       // Phase 2: Accelerate until reaching 30 degrees past the target angle
-      animatePhase(newAngle, targetAngle + 30, 700, easeInOutQuad, (newAngle) => {
+      animatePhase(newAngle, targetAngle + 25, 700, easeInOutQuad, (newAngle) => {
         // Phase 4: Accelerate until reaching 30 degrees before the target angle
-        animatePhase(newAngle, targetAngle - 30, 500, easeInOutQuad, (newAngle) => {
+        animatePhase(newAngle, targetAngle - 8, 500, easeInOutQuad, (newAngle) => {
           // Phase 5: Decelerate counterclockwise to stop at the target angle
-          animatePhase(newAngle, targetAngle, 1000, easeInOutQuad, () => {
-            // Final set to ensure exact target angle
-            setRotation(targetAngle);
+          animatePhase(newAngle, targetAngle + 3, 300, easeInOutQuad, (newAngle) => {
+            
+            animatePhase(newAngle, targetAngle, 300, easeInOutQuad, () => {
+              // Final set to ensure exact target angle
+              setRotation(targetAngle);
+          });
           });
         });
       });
@@ -279,6 +208,80 @@ function animateArrow(targetAngle) {
 
   startAnimation();
 }
+async function getCurrentWindData () {
+  const apiUrl =
+    'https://api.open-meteo.com/v1/forecast?latitude=39.9696&longitude=-75.1876&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=uv_index&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York'
+  const latitude = 39.9696 // Latitude for Boathouse Row, Philadelphia
+  const longitude = -75.1876 // Longitude for Boathouse Row, Philadelphia
+  const parameters = [
+    'current_weather=true',
+    'latitude=' + latitude,
+    'longitude=' + longitude,
+    'wind_speed_unit=mph', // Use mph as the wind speed unit
+    'timezone=America/New_York'
+  ]
+
+  try {
+    // Construct the full API URL with parameters
+    const url = `${apiUrl}`
+
+    // Fetch data from the API
+    const response = await fetch(url)
+    if (!response.ok) throw new Error('Failed to fetch wind data')
+
+    // Parse the JSON response
+    const data = await response.json()
+    console.log(data)
+    // Extract current weather details
+    const currentWeather = data.current
+    const windSpeed = currentWeather.wind_speed_10m // Wind speed in mph
+    const windGust = currentWeather.wind_gusts_10m || 'N/A' // Wind gusts in mph, if available
+    const windDirection = currentWeather.wind_direction_10m || 'N/A'
+
+    console.log(`Wind Direction: ${windDirection || 'N/A'}°`)
+    console.log(`Current Wind Speed: ${windSpeed} mph`)
+    console.log(`Current Wind Gust Speed: ${windGust} mph`)
+    document.getElementById('R-WindSpeed').textContent = `${windSpeed} mph`
+    document.getElementById('R-Gusts').textContent = `${windGust || 'N/A'} mph`
+    document.getElementById('R-Direction').textContent = `${
+      windDirection || 'N/A'
+    }°`
+    animateArrow(windDirection)
+    return { windSpeed, windGust }
+  } catch (error) {
+    console.error('Error fetching wind data:', error)
+    return { windSpeed: null, windGust: null }
+  }
+}
+
+function handleCooldown (button, cooldownTime) {
+  let remainingTime = cooldownTime
+  const totalTime = cooldownTime
+
+  // Disable the button
+  button.disabled = true
+
+  const interval = setInterval(() => {
+    remainingTime--
+
+    // Calculate percentage filled
+    const percentage = ((totalTime - remainingTime) / totalTime) * 100
+
+    // Update the button's background gradient
+    button.style.background = `linear-gradient(to right, #007BFF ${percentage}%, #d6d6d6 ${percentage}%)`
+
+    if (remainingTime <= 0) {
+      clearInterval(interval)
+      button.disabled = false
+      button.style.background =
+        'linear-gradient(to right, #007BFF 100%, #007BFF 100%)'
+      button.textContent = 'Fetch Current Wind Data'
+    } else {
+      button.textContent = `Cooldown: ${remainingTime}s`
+    }
+  }, 1000)
+}
+
 
 // Example usage
 const calculatedAngle = 120; // Replace with your calculated angle

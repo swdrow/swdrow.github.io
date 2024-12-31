@@ -914,14 +914,15 @@
     }
     
     // Call the function with coordinates for Boathouse Row, Philadelphia
-    getCurrentWindDataHr(39.9676, -75.1834);
+    windSpeed, windGust, windDirection = (39.9676, -75.1834);
+    animateArrow(windDirection);
     </script>
     <script>
       // Add event listener to the button
       const fetchButton = document.getElementById('fetchButton')
       fetchButton.addEventListener('click', () => {
-        getCurrentWindData()
-        handleCooldown(fetchButton, 300) // 300 seconds = 5 minutes
+        const windData = getCurrentWindData();
+        handleCooldown(fetchButton, 300); // 300 seconds = 5 minutes
       })
     // Call the function to get the current wind data
     <!-- getCurrentWindData(); -->
