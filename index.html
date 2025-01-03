@@ -12,6 +12,12 @@
     <link href="css/templatemo-diagoona.css" rel="stylesheet" />
 </head>
 <style>
+  .wind {
+    background: transparent;
+    z-index: -99;
+    margin-top: -75 px;
+    position: absolute;
+  }
   .tm-bg {
     min-height: 100%; /* 100% of the viewport height */
     display: flex;
@@ -192,6 +198,7 @@
                             <g>
                               <text class="cls-2" transform="translate(275 200)"><tspan x="0" y="0" dominant-baseline="middle" text-anchor="middle">GUSTS</tspan></text>
                               <text class="cls-1" transform="translate(275 232)" id="R-Gusts"><tspan x="0" y="0" dominant-baseline="middle" text-anchor="middle">G</tspan></text>
+                              
                             </g>
                             <g>
                               <text class="cls-2" transform="translate(90 200)"><tspan x="0" y="0" dominant-baseline="middle" text-anchor="middle">DIRECTION</tspan></text>
@@ -828,6 +835,9 @@
                               </g>
                             </g>
                           </svg> -->
+                          <!-- <img autoplay loop muted width="500" height="300" src="WindGif.gif"> -->
+                          
+                          <!-- <img id="wind" width="67" height="40" src="WindGif2.gif"/> -->
                           <div class="tm-content-button">
                             <button id="fetchButton">Fetch Current Wind Data</button>
                           </div>
@@ -879,49 +889,7 @@
       });
     </script>
     <script>
-      async function getCurrentWindDataHr(lat, lon) {
-        try {
-            // Step 1: Get the nearest observation station
-            const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
-            if (!pointResponse.ok) throw new Error('Failed to fetch station information');
-            const pointData = await pointResponse.json();
-            const stationUrl = pointData.properties.observationStations;
-    
-            // Step 2: Fetch the nearest station's data
-            const stationListResponse = await fetch(stationUrl);
-            if (!stationListResponse.ok) throw new Error('Failed to fetch station list');
-            const stationList = await stationListResponse.json();
-            const nearestStation = stationList.features[0].id; // Get the first station
-    
-            // Step 3: Fetch the latest observation from the nearest station
-            const observationResponse = await fetch(`${nearestStation}/observations/latest`);
-            if (!observationResponse.ok) throw new Error('Failed to fetch latest observation');
-            const observationData = await observationResponse.json();
-    
-            // Step 4: Extract wind data
-            const windSpeed = observationData.properties.windSpeed.value; // in m/s
-            const windGust = observationData.properties.windGust?.value; // in m/s
-            const windDirection = observationData.properties.windDirection.value; // in degrees
-    
-            // Convert wind speed to km/h
-            const windSpeedKmH = windSpeed ? (windSpeed * 3.6).toFixed(2) : null;
-            const windGustKmH = windGust ? (windGust * 3.6).toFixed(2) : null;
-    
-            console.log(`Wind Speed: ${windSpeedKmH || 'N/A'} km/h`);
-            console.log(`Wind Gust: ${windGustKmH || 'N/A'} km/h`);
-            console.log(`Wind Direction: ${windDirection || 'N/A'}°`);
-    
-            return { windSpeed: windSpeedKmH, windGust: windGustKmH, windDirection };
-        } catch (error) {
-            console.error('Error fetching current wind data:', error);
-            return { windSpeed: null, windGust: null, windDirection: null };
-        }
-    }
-    
-    // Call the function with coordinates for Boathouse Row, Philadelphia
-    <!-- const windDataThing = getCurrentWindDataHr(39.9676, -75.1834);
-    windCorrection = (windDataThing.windDirection + 90)%360;
-    animateArrow(windCorrection); -->
+     
     </script>
     <script>
       // Add event listener to the button
@@ -933,5 +901,12 @@
     // Call the function to get the current wind data
     <!-- getCurrentWindData(); -->
     </script>
+    <script>
+      const wind = document.getElementById('wind');
+      const gusts = document.getElementById('R-Gusts');
+      const gustRect = gusts.getBoundingClientRect();
+      wind.style.position = 'absolute';wind.style.left = `${gustRect.left - 232}px`;wind.style.top = `${gustRect.top-150}px`; wind.style.zIndex = gusts.style.zIndex - 1;
+    </script>
+
 </body>
 </html>

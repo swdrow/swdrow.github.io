@@ -89,16 +89,16 @@ function checkAndLoadWindData() {
   const storedData = localStorage.getItem(localStorageKey);
   const storedTimestamp = localStorage.getItem('timestamp');
   const now = new Date().getTime();
-  const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
+  const tenMinutes = 10 * 60 * 1000; // 15 minutes in milliseconds
   const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   if (storedData && storedTimestamp) {
     const timeElapsed = now - parseInt(storedTimestamp, 10);
 
-    if (timeElapsed < fifteenMinutes) {
+    if (timeElapsed < tenMinutes) {
       const windData = JSON.parse(storedData);
       console.log('Loaded data from localStorage:', windData);
-      updateUI(windData);
+      updateUI(windData.data);
       return;
     }
 
@@ -116,28 +116,29 @@ async function fetchAndStoreWindData() {
   const localStorageKey = 'currentWindData';
   const timestamp = new Date().toISOString();
   localStorage.setItem(localStorageKey, JSON.stringify({ data: windData, timestamp: timestamp }));
-
+  console.log("fetchAndStoreWindData", windData);
   localStorage.setItem(localStorageKey, JSON.stringify(windData));
   localStorage.setItem('timestamp', now.toString());
 
-  updateUI(windData);
+  updateUI(windData.data);
 }
 
 async function getAverageWindDataBoathouseRow () {
   const lat = 39.9696 // Latitude for Boathouse Row, Philadelphia
   const lon = -75.1834 // Longitude for Boathouse Row, Philadelphia
-  const noaaEndpoint = `https://api.weather.gov/points/${lat},${lon}`
+  const endpoint = `https://api.weather.gov/points/${lat},${lon}`
 
   try {
     // Step 1: Get the grid data endpoint
-    const pointResponse = await fetch(noaaEndpoint)
-    if (!pointResponse.ok) throw new Error('Failed to fetch NOAA point data')
-    const pointData = await pointResponse.json()
-    const gridDataUrl = pointData.properties.forecastGridData
+    const response = await fetch(endpoint)
+    if (!response.ok) throw new Error('Failed to fetch point data')
+    const data = await response.json()
+    console.log('Point data:', data)
+    const gridDataUrl = data.properties.forecastGridData
 
     // Step 2: Fetch the forecast grid data
     const gridResponse = await fetch(gridDataUrl)
-    if (!gridResponse.ok) throw new Error('Failed to fetch NOAA grid data')
+    if (!gridResponse.ok) throw new Error('Failed to fetch grid data')
     const gridData = await gridResponse.json()
     console.log('Grid data:', gridData)
     // Step 3: Extract wind data
@@ -158,7 +159,20 @@ async function getAverageWindDataBoathouseRow () {
     const filteredWindDirections = windDirectionData.filter(
       entry => new Date(entry.validTime.split('/')[0]) <= currentTime
     )
+    function avgFilter(arr) {
+      if (arr.length >= 2) {
+        const seclast = arr.slice(-2);
+        avgL2 = (seclast[1].value);
+        console.log(avgL2);
+        return avgL2;
+      } else {
+        console.log('Not enough data to calculate the average wind speed.');
+      }
+    };
 
+    console.log('Filtered wind speeds:', filteredWindSpeeds)
+    console.log('Filtered wind gusts:', filteredWindGusts)
+    console.log('Filtered wind directions:', filteredWindDirections)
     // Helper function to calculate average value
     const calculateAverage = data => {
       if (data.length === 0) return null
@@ -167,54 +181,25 @@ async function getAverageWindDataBoathouseRow () {
     }
 
     // Calculate average wind speed and gust
-    const avgWindSpeed = calculateAverage(filteredWindSpeeds) * 0.62
-    const avgWindGust = calculateAverage(filteredWindGusts) * 0.62
-
-    // Calculate average wind direction using vector math
-    if (filteredWindDirections.length > 0) {
-      const sinSum = filteredWindDirections.reduce(
-        (sum, entry) => sum + Math.sin((entry.value * Math.PI) / 180),
-        0
-      )
-      const cosSum = filteredWindDirections.reduce(
-        (sum, entry) => sum + Math.cos((entry.value * Math.PI) / 180),
-        0
-      )
-
-      // Convert the averaged components back to degrees
-      const avgWindDirection =
-        (Math.atan2(sinSum, cosSum) * (180 / Math.PI) + 360) % 360
-      document.getElementById(
-        'R-WindSpeed'
-      ).textContent = `${avgWindSpeed.toFixed(2)} mph`
-      document.getElementById('R-Gusts').textContent = `${avgWindGust.toFixed(
-        2
-      )} mph`
-      document.getElementById(
-        'R-Direction'
-      ).textContent = `${avgWindDirection.toFixed(1)}°`
-      console.log(
-        `Average Wind Speed: ${avgWindSpeed || 'No data available'} mph`
-      )
-      console.log(
-        `Average Wind Gust: ${avgWindGust || 'No data available'} mph`
-      )
-      console.log(
-        `Average Wind Direction: ${avgWindDirection || 'No data available'}°`
-      )
-      console.log('Wind Correction:', ((avgWindDirection + 90)%360));
-      const windCorrection = ((avgWindDirection + 90)%360);
+    const windSpeed = avgFilter(filteredWindSpeeds) * 0.62
+    const windGust = avgFilter(filteredWindGusts) * 0.62
+    const windDirection = avgFilter(filteredWindDirections)
+    
+      console.log('Wind Correction:', ((windDirection + 90)%360));
+      const windCorrection = ((windDirection + 90)%360);
       animateArrow(windCorrection);
+      const localStorageKey = 'currentWindData';
+      const windData = {windSpeed, windGust, windDirection};
+      const timestamp = new Date().toISOString();
 
-      return { avgWindSpeed, avgWindGust, avgWindDirection }
-    } else {
-      console.log('No data available for wind direction.')
-      return { avgWindSpeed, avgWindGust, avgWindDirection: null }
+      // Store data in localStorage
+      localStorage.setItem(localStorageKey, JSON.stringify({ data: windData, timestamp: timestamp }));
+      updateUI(windData);
+      return { windSpeed, windGust, windDirection }
+    } catch (error) {
+      console.error('Error fetching wind data:', error)
+      return { windSpeed: null, windGust: null, windDirection: null }
     }
-  } catch (error) {
-    console.error('Error fetching NOAA wind data:', error)
-    return { avgWindSpeed: null, avgWindGust: null, avgWindDirection: null }
-  }
 }
 
 const arrow = document.getElementById('arrow')
@@ -374,10 +359,12 @@ async function getCurrentWindData(ignoreLocalStorage = false) {
 
 function updateUI(data) {
   const { windSpeed, windGust, windDirection } = data;
-  document.getElementById('R-WindSpeed').textContent = `${windSpeed} mph`;
-  document.getElementById('R-Gusts').textContent = `${windGust || 'N/A'} mph`;
-  document.getElementById('R-Direction').textContent = `${windDirection || 'N/A'}°`;
+  console.log('Updating UI with:', windSpeed, windGust, windDirection);
+  document.getElementById('R-WindSpeed').textContent = `${windSpeed.toFixed(0)} mph`;
+  document.getElementById('R-Gusts').textContent = `${windGust.toFixed(1) || 'N/A'} mph`;
+  document.getElementById('R-Direction').textContent = `${windDirection.toFixed(1) || 'N/A'}°`;
   const windDirectionCorrection = ((windDirection + 90)%360);
+  console.log('Wind Correction:', windDirectionCorrection);
   animateArrow(windDirectionCorrection);
 }
 
@@ -409,3 +396,33 @@ function handleCooldown (button, cooldownTime) {
   }, 1000)
 }
 
+async function getCurrentWindDataHr(lat, lon) {
+  try {
+      // Step 1: Fetch the latest observation from the specified station (KPHL)
+      const stationId = 'KPHL';
+      const observationResponse = await fetch(`https://api.weather.gov/points/${lat},${lon}`);
+      if (!observationResponse.ok) throw new Error('Failed to fetch latest observation');
+      const observationData = await observationResponse.json();
+      console.log('Observation data:', observationData);
+      const newrep =  await fetch("https://api.weather.gov/gridpoints/PHI/49,76")
+      const newrepData = await newrep.json();
+      console.log('newrepData:', newrepData);
+      // Step 2: Extract wind data
+      const windSpeed = observationData.properties.windSpeed.value; // in m/s
+      const windGust = observationData.properties.windGust?.value; // in m/s
+      const windDirection = observationData.properties.windDirection.value; // in degrees
+
+      // Convert wind speed to km/h
+      const windSpeedKmH = windSpeed ? (windSpeed * 3.6).toFixed(2) : null;
+      const windGustKmH = windGust ? (windGust * 3.6).toFixed(2) : null;
+
+      console.log(`Wind Speed: ${windSpeedKmH || 'N/A'} km/h`);
+      console.log(`Wind Gust: ${windGustKmH || 'N/A'} km/h`);
+      console.log(`Wind Direction: ${windDirection || 'N/A'}°`);
+
+      return { windSpeed: windSpeedKmH, windGust: windGustKmH, windDirection };
+  } catch (error) {
+      console.error('Error fetching current wind data:', error);
+      return { windSpeed: null, windGust: null, windDirection: null };
+  }
+}
