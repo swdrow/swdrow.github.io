@@ -1,0 +1,111 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🏠 Serve Website (Live Server)",
+      "type": "shell",
+      "command": "npx",
+      "args": ["live-server", "--port=3000", "--host=localhost"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "⚙️ Start RowCast API Server",
+      "type": "shell",
+      "command": "./start_server.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/api"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "new"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Start Full Development Environment",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "🏠 Serve Website (Live Server)",
+        "⚙️ Start RowCast API Server"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🧪 Test RowCast API",
+      "type": "shell",
+      "command": "python",
+      "args": ["test_api.py"],
+      "options": {
+        "cwd": "${workspaceFolder}/api"
+      },
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📊 Open RowCast Dashboard",
+      "type": "shell",
+      "command": "python",
+      "args": ["-c", "import webbrowser; webbrowser.open('http://localhost:8000/dashboard')"],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "📝 View API Logs",
+      "type": "shell",
+      "command": "./view_logs.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/api"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🛑 Stop RowCast API Server",
+      "type": "shell",
+      "command": "./stop_server.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/api"
+      },
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

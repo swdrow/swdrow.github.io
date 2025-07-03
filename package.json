@@ -1,0 +1,19 @@
+{
+  "name": "swdrow-website",
+  "version": "1.0.0",
+  "description": "Sam Duncan's professional website with integrated RowCast API",
+  "scripts": {
+    "dev": "echo 'Main website runs directly from files - no build needed'",
+    "dev:api": "cd api && ./start_server.sh",
+    "test:api": "cd api && python test_api.py",
+    "deploy": "echo 'Deploy via Cloudflare Pages or GitHub Pages'",
+    "install:api": "cd api && pip install -r requirements.txt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swdrow/swdrow.github.io.git"
+  },
+  "keywords": ["portfolio", "website", "rowing", "api", "weather", "conditions"],
+  "author": "Sam Duncan",
+  "license": "MIT"
+}

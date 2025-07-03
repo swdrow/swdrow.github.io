@@ -1,0 +1,102 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# API specific
+api/logs/
+api/*.log
+api/__pycache__/
+api/*/__pycache__/
+api/logs/*.log
+api/*.pid
+api/debug_*.html
+api/test_*.py
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Archive files
+*.tar
+*.tar.gz
+*.zip
+
+# API debug files
+api/debug_test.html
+api/MONOREPO_*.md
+api/FINAL_*.md
+api/integrate_*.sh
