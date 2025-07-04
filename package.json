@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Sam Duncan's professional website with integrated RowCast API",
   "scripts": {
-    "dev": "echo 'Main website runs directly from files - no build needed'",
+    "dev": "cd api && npm run dev",
+    "build": "cd api && npm run build",
+    "preview": "cd api && npm run preview",
     "dev:api": "cd api && ./start_server.sh",
     "test:api": "cd api && python test_api.py",
     "deploy": "echo 'Deploy via Cloudflare Pages or GitHub Pages'",
@@ -34,6 +36,7 @@
   },
   "dependencies": {
     "express": "^5.1.0",
-    "http-proxy-middleware": "^3.0.5"
+    "http-proxy-middleware": "^3.0.5",
+    "vite": "^7.0.1"
   }
 }

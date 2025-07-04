@@ -4,11 +4,13 @@
 echo "🏗️  Building RowCast for Production"
 echo "=================================="
 
-# Build frontend assets
+# Build frontend assets from api directory, but set root to parent
+cd $(dirname "$0")
 echo "📦 Building frontend assets..."
 npm run build
+BUILD_STATUS=$?
 
-if [ $? -ne 0 ]; then
+if [ $BUILD_STATUS -ne 0 ]; then
     echo "❌ Frontend build failed!"
     exit 1
 fi

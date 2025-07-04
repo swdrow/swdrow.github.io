@@ -32,19 +32,25 @@ windowH()
 
 async function fetchWaterData () {
   try {
+    // Determine API base URL based on current port
+    const currentPort = window.location.port;
+    const apiBaseURL = currentPort === '8000' ? 'http://localhost:5000' : '';
+    
     // Fetch from our local API instead of USGS directly
-    const response = await fetch('/api/water/current')
+    const response = await fetch(`${apiBaseURL}/api/water/current`)
     if (!response.ok) {
       throw new Error(`Error fetching data: ${response.statusText}`)
     }
     const data = await response.json()
+    
+    console.log('💧 Fetched water data:', data);
 
-    // Update the respective containers in the HTML
-    document.getElementById('R-Height').textContent = `${data.height || 'N/A'} ft`
-    document.getElementById('R-Temp').textContent = `${data.temperature || 'N/A'}°F`
-    document.getElementById('R-Discharge').textContent = `${data.flow || 'N/A'} ft³/s`
+    // Update the respective containers in the HTML - fix field mapping
+    document.getElementById('R-Height').textContent = `${data.gaugeHeight || 'N/A'} ft`
+    document.getElementById('R-Temp').textContent = `${data.waterTemp || 'N/A'}°F`
+    document.getElementById('R-Discharge').textContent = `${data.discharge || 'N/A'} ft³/s`
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error fetching water data:', error)
     // Update the containers with error messages
     document.getElementById('R-Height').textContent = 'Error'
     document.getElementById('R-Temp').textContent = 'Error'
@@ -384,5 +390,33 @@ async function getCurrentWindDataHr(lat, lon) {
   } catch (error) {
       console.error('Error fetching current wind data:', error);
       return { windSpeed: null, windGust: null, windDirection: null };
+  }
+}
+
+async function fetchWindData() {
+  try {
+    // Determine API base URL based on current port
+    const currentPort = window.location.port;
+    const apiBaseURL = currentPort === '8000' ? 'http://localhost:5000' : '';
+    
+    // Fetch from our local weather API
+    const response = await fetch(`${apiBaseURL}/api/weather/current`)
+    if (!response.ok) {
+      throw new Error(`Error fetching wind data: ${response.statusText}`)
+    }
+    const data = await response.json()
+    
+    console.log('🌬️ Fetched wind data:', data);
+
+    // Update the wind elements in the HTML
+    document.getElementById('R-WindSpeed').textContent = `${Math.round(data.windSpeed || 0)} mph`
+    document.getElementById('R-Gusts').textContent = `${Math.round(data.windGust || 0)} mph`
+    document.getElementById('R-Direction').textContent = data.windDir || 'N/A'
+  } catch (error) {
+    console.error('Error fetching wind data:', error)
+    // Update the containers with error messages
+    document.getElementById('R-WindSpeed').textContent = 'Error'
+    document.getElementById('R-Gusts').textContent = 'Error'
+    document.getElementById('R-Direction').textContent = 'Error'
   }
 }

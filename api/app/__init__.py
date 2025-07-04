@@ -15,7 +15,18 @@ def create_app():
     app = Flask(__name__)
     
     # Enable CORS for all routes
-    CORS(app, origins=["http://localhost:8000", "http://localhost:8001"])
+    # Allow localhost for development and production domains
+    allowed_origins = [
+        "http://localhost:8000", 
+        "http://localhost:8001", 
+        "http://localhost:3000",
+        "http://localhost:3001", 
+        "http://localhost:3002",
+        "https://api.samwduncan.com",
+        "https://samwduncan.com",
+        "https://www.samwduncan.com"
+    ]
+    CORS(app, origins=allowed_origins)
     
     # Configuration for development vs production
     env = os.getenv('FLASK_ENV', 'development')
@@ -42,6 +53,40 @@ def create_app():
 
     # --- Register Blueprints ---
     app.register_blueprint(bp)
+    
+    # Add static file serving routes to the main app
+    @app.route('/')
+    def serve_index():
+        """Serve the main SPA index.html"""
+        import os
+        from flask import send_from_directory
+        dist_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dist')
+        return send_from_directory(dist_dir, 'index.html')
+
+    @app.route('/<path:path>')
+    def serve_static(path):
+        """Serve static files from the dist directory"""
+        import os
+        from flask import send_from_directory
+        dist_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dist')
+        
+        # Skip API routes - let them be handled by the blueprint
+        if path.startswith('api/'):
+            from flask import abort
+            abort(404)
+        
+        # Check if file exists in dist directory first
+        file_path = os.path.join(dist_dir, path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return send_from_directory(dist_dir, path)
+        
+        # For SPA routing (no file extension), serve index.html
+        if '.' not in path:
+            return send_from_directory(dist_dir, 'index.html')
+        
+        # File not found
+        from flask import abort
+        abort(404)
 
     # --- Initialize Scheduler and Add Jobs ---
     # Import tasks here, inside the factory, to ensure the app context is available
@@ -100,12 +145,13 @@ def create_app():
             minutes=30  # Calculate extended forecast scores after NOAA updates
         )
         # Run initial data fetch and forecasting immediately
-        update_weather_data_job()
-        update_water_data_job()
-        update_noaa_stageflow_job()
-        update_extended_weather_data_job()
-        update_forecast_scores_job()
-        update_extended_forecast_scores_job()
-        update_short_term_forecast_job()
+        # TODO: Temporarily disabled to allow server to start - these jobs should run in background
+        # update_weather_data_job()
+        # update_water_data_job()
+        # update_noaa_stageflow_job()
+        # update_extended_weather_data_job()
+        # update_forecast_scores_job()
+        # update_extended_forecast_scores_job()
+        # update_short_term_forecast_job()
 
     return app

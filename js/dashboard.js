@@ -84,7 +84,10 @@ class RowCastDashboard {
             this.updateForecastWidget();
             this.updateDetailedForecast();
             this.updateCurrentConditions();
-            this.initializeCharts();
+            await this.updateDetailedForecastTable();
+            this.updateQuickForecast();
+            this.updateWindMap();
+            await this.initializeCharts();
         } catch (error) {
             console.error('Error loading initial data:', error);
             this.showError('Failed to load data. Please try again.');
@@ -421,48 +424,346 @@ class RowCastDashboard {
         `;
     }
 
-    initializeCharts() {
-        this.initializeScoreChart();
-        this.initializeConditionsChart();
+    // ===== ENHANCED FORECASTING FUNCTIONALITY =====
+    
+    async generateForecastData() {
+        // Generate 48-hour detailed forecast with RowCast scoring
+        const now = new Date();
+        const forecastData = [];
+        
+        for (let i = 0; i < 48; i++) {
+            const timestamp = new Date(now.getTime() + (i * 60 * 60 * 1000));
+            
+            // Simulate realistic weather patterns
+            const baseTemp = 65 + Math.sin((i / 24) * Math.PI * 2) * 15; // Daily temperature cycle
+            const windVariation = Math.sin((i / 6) * Math.PI) * 5 + Math.random() * 3;
+            const pressurePattern = 1013 + Math.sin((i / 12) * Math.PI) * 10;
+            
+            const conditions = {
+                windSpeed: Math.max(0, 8 + windVariation),
+                windDirection: (180 + i * 7.5) % 360, // Gradually changing wind direction
+                windGust: Math.max(0, 12 + windVariation + Math.random() * 5),
+                temperature: baseTemp + Math.random() * 5 - 2.5,
+                apparentTemp: baseTemp + Math.random() * 3,
+                humidity: 60 + Math.sin((i / 8) * Math.PI) * 20 + Math.random() * 10,
+                pressure: pressurePattern + Math.random() * 5,
+                visibility: 10 - Math.random() * 2,
+                cloudCover: Math.min(100, Math.max(0, 40 + Math.sin((i / 16) * Math.PI) * 30 + Math.random() * 20)),
+                precipChance: Math.max(0, Math.sin((i / 18) * Math.PI) * 30 + Math.random() * 10),
+                discharge: 1500 + Math.sin((i / 48) * Math.PI) * 200 + Math.random() * 100,
+                waterTemp: 58 + Math.sin(((now.getMonth() + i/24/30) / 12) * Math.PI * 2) * 15
+            };
+            
+            // Calculate RowCast score based on conditions
+            const score = this.calculateAdvancedRowCastScore(conditions);
+            
+            forecastData.push({
+                timestamp: timestamp.toISOString(),
+                score: score,
+                conditions: conditions,
+                summary: this.generateConditionSummary(score, conditions)
+            });
+        }
+        
+        return forecastData;
+    }
+    
+    calculateAdvancedRowCastScore(conditions) {
+        let score = 10;
+        
+        // Wind factors (weight: 35%)
+        const windScore = this.calculateWindScore(conditions.windSpeed, conditions.windGust);
+        
+        // Water factors (weight: 25%)
+        const waterScore = this.calculateWaterScore(conditions.discharge, conditions.waterTemp);
+        
+        // Weather factors (weight: 25%)
+        const weatherScore = this.calculateWeatherScore(conditions.temperature, conditions.precipChance, conditions.visibility);
+        
+        // Comfort factors (weight: 15%)
+        const comfortScore = this.calculateComfortScore(conditions.apparentTemp, conditions.humidity);
+        
+        score = (windScore * 0.35) + (waterScore * 0.25) + (weatherScore * 0.25) + (comfortScore * 0.15);
+        
+        return Math.max(0, Math.min(10, score));
+    }
+    
+    calculateWindScore(windSpeed, windGust) {
+        let windScore = 10;
+        
+        // Ideal wind: 0-8 mph
+        if (windSpeed > 15) windScore -= 4;
+        else if (windSpeed > 12) windScore -= 2;
+        else if (windSpeed > 8) windScore -= 1;
+        
+        // Gust penalty
+        if (windGust > 25) windScore -= 3;
+        else if (windGust > 20) windScore -= 2;
+        else if (windGust > 15) windScore -= 1;
+        
+        return Math.max(0, windScore);
+    }
+    
+    calculateWaterScore(discharge, waterTemp) {
+        let waterScore = 10;
+        
+        // Ideal flow: 1000-3000 ft³/s
+        if (discharge > 4000 || discharge < 600) waterScore -= 3;
+        else if (discharge > 3500 || discharge < 800) waterScore -= 2;
+        else if (discharge > 3000 || discharge < 1000) waterScore -= 1;
+        
+        // Water temperature (ideal: 55-75°F)
+        if (waterTemp < 45 || waterTemp > 80) waterScore -= 2;
+        else if (waterTemp < 50 || waterTemp > 75) waterScore -= 1;
+        
+        return Math.max(0, waterScore);
+    }
+    
+    calculateWeatherScore(temperature, precipChance, visibility) {
+        let weatherScore = 10;
+        
+        // Temperature comfort (ideal: 60-80°F)
+        if (temperature < 40 || temperature > 90) weatherScore -= 3;
+        else if (temperature < 50 || temperature > 85) weatherScore -= 2;
+        else if (temperature < 55 || temperature > 80) weatherScore -= 1;
+        
+        // Precipitation penalty
+        if (precipChance > 70) weatherScore -= 3;
+        else if (precipChance > 50) weatherScore -= 2;
+        else if (precipChance > 30) weatherScore -= 1;
+        
+        // Visibility
+        if (visibility < 5) weatherScore -= 2;
+        else if (visibility < 8) weatherScore -= 1;
+        
+        return Math.max(0, weatherScore);
+    }
+    
+    calculateComfortScore(apparentTemp, humidity) {
+        let comfortScore = 10;
+        
+        // Apparent temperature comfort
+        if (apparentTemp < 45 || apparentTemp > 85) comfortScore -= 2;
+        else if (apparentTemp < 55 || apparentTemp > 80) comfortScore -= 1;
+        
+        // Humidity comfort
+        if (humidity > 80) comfortScore -= 2;
+        else if (humidity > 70) comfortScore -= 1;
+        else if (humidity < 30) comfortScore -= 1;
+        
+        return Math.max(0, comfortScore);
+    }
+    
+    generateConditionSummary(score, conditions) {
+        if (score >= 8.5) return "Excellent rowing conditions";
+        if (score >= 7) return "Good rowing conditions";
+        if (score >= 5) return "Fair conditions - some challenges";
+        if (score >= 3) return "Poor conditions - not recommended";
+        return "Dangerous conditions - avoid rowing";
+    }
+    
+    // ===== WIND MAP FUNCTIONALITY =====
+    
+    updateWindMap() {
+        const windData = this.currentData?.wind || this.getSimulatedWindData();
+        
+        // Update main wind arrow
+        const mainArrow = document.getElementById('main-wind-arrow');
+        const mainSpeedLabel = document.getElementById('main-wind-speed');
+        
+        if (mainArrow && windData) {
+            const rotation = windData.direction || 0;
+            mainArrow.style.transform = `rotate(${rotation}deg)`;
+        }
+        
+        if (mainSpeedLabel && windData) {
+            mainSpeedLabel.textContent = `${Math.round(windData.speed || 0)} mph`;
+        }
+        
+        // Update secondary wind arrows with slight variations
+        const secondaryArrows = document.querySelectorAll('.secondary-wind-arrow');
+        const secondaryLabels = document.querySelectorAll('.secondary-wind-speed');
+        
+        secondaryArrows.forEach((arrow, index) => {
+            const variation = (Math.random() - 0.5) * 30; // ±15 degree variation
+            const speedVariation = (Math.random() - 0.5) * 4; // ±2 mph variation
+            
+            const direction = (windData.direction || 0) + variation;
+            const speed = Math.max(0, (windData.speed || 0) + speedVariation);
+            
+            arrow.style.transform = `rotate(${direction}deg)`;
+            
+            if (secondaryLabels[index]) {
+                secondaryLabels[index].textContent = `${Math.round(speed)} mph`;
+            }
+        });
+    }
+    
+    getSimulatedWindData() {
+        const now = new Date();
+        const hour = now.getHours();
+        
+        // Simulate daily wind patterns
+        const baseSpeed = 6 + Math.sin((hour / 24) * Math.PI * 2) * 3;
+        const baseDirection = 180 + hour * 15; // Wind direction changes throughout day
+        
+        return {
+            speed: baseSpeed + Math.random() * 4,
+            direction: baseDirection % 360,
+            gust: baseSpeed + 3 + Math.random() * 5
+        };
+    }
+    
+    // ===== ENHANCED FORECAST TABLE =====
+    
+    async updateDetailedForecastTable() {
+        let forecastData = this.forecastData;
+        
+        if (!forecastData || forecastData.length === 0) {
+            forecastData = await this.generateForecastData();
+            this.forecastData = forecastData;
+        }
+        
+        const tbody = document.getElementById('forecast-table-body');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        // Show next 48 hours in 3-hour intervals
+        const filteredData = forecastData.filter((_, index) => index % 3 === 0);
+        
+        filteredData.forEach(item => {
+            const row = document.createElement('tr');
+            const time = new Date(item.timestamp);
+            const conditions = item.conditions || {};
+            
+            const scoreClass = this.getScoreClass(item.score);
+            
+            row.innerHTML = `
+                <td style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">
+                    <div style="font-weight: 600;">${time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">${time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</div>
+                </td>
+                <td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid var(--border-color);">
+                    <div class="score-badge ${scoreClass}" style="display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">
+                        ${item.score.toFixed(1)}
+                    </div>
+                </td>
+                <td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">
+                    <div style="font-size: 0.9rem;">${item.summary}</div>
+                </td>
+                <td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">
+                    <div style="margin-bottom: 0.25rem;">${Math.round(conditions.windSpeed || 0)} mph</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Gusts: ${Math.round(conditions.windGust || 0)} mph</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">${this.getWindDirection(conditions.windDirection)}</div>
+                </td>
+                <td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">
+                    <div style="margin-bottom: 0.25rem;">${Math.round(conditions.discharge || 0)} ft³/s</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Water: ${Math.round(conditions.waterTemp || 0)}°F</div>
+                </td>
+                <td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">
+                    <div style="margin-bottom: 0.25rem;">${Math.round(conditions.temperature || 0)}°F</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Feels: ${Math.round(conditions.apparentTemp || 0)}°F</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Rain: ${Math.round(conditions.precipChance || 0)}%</div>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+    
+    getWindDirection(degrees) {
+        if (!degrees && degrees !== 0) return 'N/A';
+        
+        const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+        const index = Math.round(degrees / 22.5) % 16;
+        return directions[index];
+    }
+    
+    // ===== QUICK FORECAST WIDGET =====
+    
+    updateQuickForecast() {
+        let forecastData = this.forecastData;
+        
+        if (!forecastData || forecastData.length === 0) {
+            forecastData = this.generateForecastData();
+            this.forecastData = forecastData;
+        }
+        
+        const container = document.getElementById('quick-forecast');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Show next 6 hours
+        const quickData = forecastData.slice(1, 7); // Skip current hour, show next 6
+        
+        quickData.forEach(item => {
+            const time = new Date(item.timestamp);
+            const scoreClass = this.getScoreClass(item.score);
+            
+            const card = document.createElement('div');
+            card.style.cssText = `
+                text-align: center;
+                padding: 0.75rem;
+                background: var(--tertiary-dark);
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+            `;
+            
+            card.innerHTML = `
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    ${time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}
+                </div>
+                <div class="score-badge ${scoreClass}" style="display: inline-block; padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 600; margin-bottom: 0.5rem;">
+                    ${item.score.toFixed(1)}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                    ${Math.round(item.conditions.windSpeed || 0)} mph wind
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
     }
 
-    initializeScoreChart() {
-        const ctx = document.getElementById('score-chart').getContext('2d');
-        const data = this.getCurrentForecastData();
+    // ===== ENHANCED CHART FUNCTIONALITY =====
+    
+    async initializeCharts() {
+        await this.createRowCastForecastChart();
+        await this.createWindForecastChart();
+        this.setupChartUpdates();
+    }
+    
+    async createRowCastForecastChart() {
+        let forecastData = this.forecastData;
         
-        if (!data || !data.length) return;
-
-        const labels = data.map(item => {
-            const time = new Date(item.timestamp);
-            return time.toLocaleTimeString('en-US', { 
-                timeZone: 'America/New_York',
-                hour: 'numeric', 
-                hour12: true 
-            });
-        });
-
-        const scores = data.map(item => item.score || 0);
-
-        if (this.charts.scoreChart) {
-            this.charts.scoreChart.destroy();
+        if (!forecastData || forecastData.length === 0) {
+            forecastData = await this.generateForecastData();
+            this.forecastData = forecastData;
         }
-
-        this.charts.scoreChart = new Chart(ctx, {
+        
+        const ctx = document.getElementById('rowcast-forecast-chart');
+        if (!ctx || this.charts.rowcastForecast) return;
+        
+        // Use 48 hours of data
+        const chartData = forecastData.slice(0, 48);
+        
+        this.charts.rowcastForecast = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: chartData.map(item => {
+                    const time = new Date(item.timestamp);
+                    return time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+                }),
                 datasets: [{
                     label: 'RowCast Score',
-                    data: scores,
-                    borderColor: '#007acc',
-                    backgroundColor: 'rgba(0, 122, 204, 0.1)',
-                    borderWidth: 3,
+                    data: chartData.map(item => item.score),
+                    borderColor: '#00a8ff',
+                    backgroundColor: 'rgba(0, 168, 255, 0.1)',
+                    borderWidth: 2,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#007acc',
-                    pointBorderColor: '#ffffff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
+                    tension: 0.4
                 }]
             },
             options: {
@@ -474,406 +775,174 @@ class RowCastDashboard {
                     }
                 },
                 scales: {
-                    x: {
-                        grid: {
-                            color: '#333333'
-                        },
-                        ticks: {
-                            color: '#b0b0b0'
-                        }
-                    },
                     y: {
-                        min: 0,
+                        beginAtZero: true,
                         max: 10,
                         grid: {
-                            color: '#333333'
+                            color: 'rgba(255, 255, 255, 0.1)'
                         },
                         ticks: {
-                            color: '#b0b0b0'
+                            color: '#ffffff'
                         }
-                    }
-                },
-                elements: {
-                    point: {
-                        hoverRadius: 8
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#ffffff',
+                            maxTicksLimit: 8
+                        }
                     }
                 }
             }
         });
     }
-
-    initializeConditionsChart() {
-        const ctx = document.getElementById('conditions-chart').getContext('2d');
-        const data = this.getCurrentForecastData();
+    
+    async createWindForecastChart() {
+        let forecastData = this.forecastData;
         
-        if (!data || !data.length) return;
-
-        const labels = data.map(item => {
-            const time = new Date(item.timestamp);
-            return time.toLocaleTimeString('en-US', { 
-                timeZone: 'America/New_York',
-                hour: 'numeric', 
-                hour12: true 
-            });
-        });
-
-        const windSpeeds = data.map(item => item.conditions?.windSpeed || 0);
-        const temps = data.map(item => item.conditions?.apparentTemp || 0);
-
-        if (this.charts.conditionsChart) {
-            this.charts.conditionsChart.destroy();
+        if (!forecastData || forecastData.length === 0) {
+            forecastData = await this.generateForecastData();
+            this.forecastData = forecastData;
         }
-
-        this.charts.conditionsChart = new Chart(ctx, {
-            type: 'line',
+        
+        const ctx = document.getElementById('wind-forecast-chart');
+        if (!ctx || this.charts.windForecast) return;
+        
+        // Use 24 hours of data for wind chart
+        const chartData = forecastData.slice(0, 24);
+        
+        this.charts.windForecast = new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Wind Speed (mph)',
-                        data: windSpeeds,
-                        borderColor: '#28a745',
-                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                        borderWidth: 2,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'Temperature (°F)',
-                        data: temps,
-                        borderColor: '#dc3545',
-                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                        borderWidth: 2,
-                        yAxisID: 'y1'
-                    }
-                ]
+                labels: chartData.map(item => {
+                    const time = new Date(item.timestamp);
+                    return time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+                }),
+                datasets: [{
+                    label: 'Wind Speed (mph)',
+                    data: chartData.map(item => item.conditions.windSpeed),
+                    backgroundColor: 'rgba(108, 92, 231, 0.6)',
+                    borderColor: '#6c5ce7',
+                    borderWidth: 1
+                }, {
+                    label: 'Wind Gusts (mph)',
+                    data: chartData.map(item => item.conditions.windGust),
+                    backgroundColor: 'rgba(255, 107, 129, 0.6)',
+                    borderColor: '#ff6b81',
+                    borderWidth: 1
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#b0b0b0'
+                            color: '#ffffff'
                         }
                     }
                 },
                 scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#ffffff'
+                        }
+                    },
                     x: {
                         grid: {
-                            color: '#333333'
+                            color: 'rgba(255, 255, 255, 0.1)'
                         },
                         ticks: {
-                            color: '#b0b0b0'
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        grid: {
-                            color: '#333333'
-                        },
-                        ticks: {
-                            color: '#b0b0b0'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Wind Speed (mph)',
-                            color: '#28a745'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                        ticks: {
-                            color: '#b0b0b0'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Temperature (°F)',
-                            color: '#dc3545'
+                            color: '#ffffff',
+                            maxTicksLimit: 8
                         }
                     }
                 }
             }
         });
     }
-
-    getCurrentForecastData() {
-        switch (this.currentTimeRange) {
-            case '24h':
-                return this.forecastData || [];
-            case '7d':
-            case 'extended':
-                return this.extendedData || [];
-            default:
-                return this.forecastData || [];
+    
+    setupChartUpdates() {
+        // Update charts every 10 minutes
+        setInterval(() => {
+            this.updateCharts();
+        }, 600000);
+    }
+    
+    async updateCharts() {
+        // Regenerate forecast data
+        this.forecastData = await this.generateForecastData();
+        
+        // Update RowCast forecast chart
+        if (this.charts.rowcastForecast) {
+            const chartData = this.forecastData.slice(0, 48);
+            this.charts.rowcastForecast.data.labels = chartData.map(item => {
+                const time = new Date(item.timestamp);
+                return time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+            });
+            this.charts.rowcastForecast.data.datasets[0].data = chartData.map(item => item.score);
+            this.charts.rowcastForecast.update();
+        }
+        
+        // Update wind forecast chart
+        if (this.charts.windForecast) {
+            const chartData = this.forecastData.slice(0, 24);
+            this.charts.windForecast.data.labels = chartData.map(item => {
+                const time = new Date(item.timestamp);
+                return time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+            });
+            this.charts.windForecast.data.datasets[0].data = chartData.map(item => item.conditions.windSpeed);
+            this.charts.windForecast.data.datasets[1].data = chartData.map(item => item.conditions.windGust);
+            this.charts.windForecast.update();
         }
     }
 
+    // ===== TIME RANGE AND NAVIGATION =====
+    
     setTimeRange(range) {
         this.currentTimeRange = range;
         this.currentPage = 0;
-        this.selectedDay = null; // Reset selected day
-
-        // Update button states
+        
+        // Update active button
         document.querySelectorAll('.time-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.range === range);
+            btn.classList.remove('active');
         });
-
-        // Update displays
-        this.updateForecastWidget();
-        this.updateDetailedForecast();
-        this.initializeCharts();
-    }
-
-    changeForecastPage(direction) {
-        const data = this.getCurrentForecastData();
-        const totalPages = Math.ceil(data.length / this.itemsPerPage);
+        document.querySelector(`[data-range="${range}"]`)?.classList.add('active');
         
-        this.currentPage += direction;
-        this.currentPage = Math.max(0, Math.min(this.currentPage, totalPages - 1));
-        
-        this.updateForecastWidget();
+        // Update forecast display based on range
+        this.updateForecastForTimeRange(range);
     }
-
-    updatePagination(totalItems) {
-        const totalPages = Math.ceil(totalItems / this.itemsPerPage);
-        const currentPageDisplay = totalPages > 0 ? this.currentPage + 1 : 0;
-        
-        document.getElementById('page-indicator').textContent = `${currentPageDisplay} / ${totalPages}`;
-        document.getElementById('prev-page').disabled = this.currentPage === 0;
-        document.getElementById('next-page').disabled = this.currentPage >= totalPages - 1;
-    }
-
-    async loadAPIDocumentation() {
-        const container = document.querySelector('.api-docs-content');
-        
-        // Redirect to the dedicated documentation page
-        window.open('/documentation', '_blank');
-        
-        // Also show a simplified version inline
-        container.innerHTML = `
-            <div style="text-align: center; padding: 2rem;">
-                <h2 style="color: var(--accent-tertiary); margin-bottom: 1rem;">
-                    <i class="fas fa-external-link-alt"></i> 
-                    API Documentation
-                </h2>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-                    Complete API documentation has opened in a new tab.
-                </p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                    <div class="api-endpoint">
-                        <div class="endpoint-header">
-                            <span class="http-method method-get">GET</span>
-                            <span class="endpoint-url">
-                                <a href="${this.baseURL}/api/complete" target="_blank">
-                                    ${this.baseURL}/api/complete
-                                </a>
-                            </span>
-                        </div>
-                        <div class="endpoint-description">Get all current data and forecasts</div>
-                    </div>
-                    <div class="api-endpoint">
-                        <div class="endpoint-header">
-                            <span class="http-method method-get">GET</span>
-                            <span class="endpoint-url">
-                                <a href="${this.baseURL}/api/rowcast/forecast" target="_blank">
-                                    ${this.baseURL}/api/rowcast/forecast
-                                </a>
-                            </span>
-                        </div>
-                        <div class="endpoint-description">24-hour rowing condition forecast</div>
-                    </div>
-                    <div class="api-endpoint">
-                        <div class="endpoint-header">
-                            <span class="http-method method-get">GET</span>
-                            <span class="endpoint-url">
-                                <a href="${this.baseURL}/api/rowcast/forecast/extended" target="_blank">
-                                    ${this.baseURL}/api/rowcast/forecast/extended
-                                </a>
-                            </span>
-                        </div>
-                        <div class="endpoint-description">Extended forecast (up to 7 days)</div>
-                    </div>
-                </div>
-                <div style="margin-top: 2rem;">
-                    <a href="/documentation" target="_blank" class="refresh-btn">
-                        <i class="fas fa-book"></i>
-                        View Full Documentation
-                    </a>
-                </div>
-            </div>
-        `;
-    }
-
-    async refreshData() {
-        this.showLoading();
-        try {
-            await this.loadInitialData();
-        } catch (error) {
-            this.showError('Failed to refresh data. Please try again.');
-        } finally {
-            this.hideLoading();
-        }
-    }
-
-    startDataRefresh() {
-        // Refresh data every 5 minutes
-        setInterval(() => {
-            this.refreshData();
-        }, 5 * 60 * 1000);
-    }
-
-    showLoading() {
-        document.getElementById('loading-overlay').classList.add('show');
-    }
-
-    hideLoading() {
-        document.getElementById('loading-overlay').classList.remove('show');
-    }
-
-    showError(message) {
-        // You could implement a toast notification system here
-        console.error(message);
-    }
-
-    // Utility methods
-    formatValue(value, unit = '') {
-        if (value === null || value === undefined) return 'N/A';
-        if (typeof value === 'number') {
-            return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}${unit ? ' ' + unit : ''}`;
-        }
-        return value.toString();
-    }
-
-    getScoreClass(score) {
-        if (score >= 8) return 'score-excellent';
-        if (score >= 6) return 'score-good';
-        if (score >= 4) return 'score-fair';
-        return 'score-poor';
-    }
-
-    getConditionsClass(score) {
-        if (score >= 8) return 'conditions-excellent';
-        if (score >= 6) return 'conditions-good';
-        if (score >= 4) return 'conditions-fair';
-        return 'conditions-poor';
-    }
-
-    getConditionsText(score) {
-        if (score >= 8) return 'Excellent';
-        if (score >= 6) return 'Good';
-        if (score >= 4) return 'Fair';
-        return 'Poor';
-    }
-
-    getSafetyLevel(score) {
-        if (score >= 8) return 'Very Safe';
-        if (score >= 6) return 'Safe';
-        if (score >= 4) return 'Caution';
-        return 'Not Recommended';
-    }
-
-    getSafetyRecommendation(score) {
-        if (score >= 8) return 'Excellent conditions for rowing';
-        if (score >= 6) return 'Good conditions with minor considerations';
-        if (score >= 4) return 'Fair conditions - exercise caution';
-        return 'Poor conditions - consider postponing';
-    }
-
-    // Tooltip functionality
-    initializeTooltips() {
-        // Create tooltip element
-        const tooltip = document.createElement('div');
-        tooltip.id = 'tooltip';
-        tooltip.className = 'tooltip';
-        document.body.appendChild(tooltip);
-
-        // Add event listeners to all elements with data-tooltip
-        document.querySelectorAll('[data-tooltip]').forEach(element => {
-            element.addEventListener('mouseenter', (e) => {
-                this.showTooltip(e, element.dataset.tooltip);
-            });
-
-            element.addEventListener('mouseleave', () => {
-                this.hideTooltip();
-            });
-
-            element.addEventListener('mousemove', (e) => {
-                this.positionTooltip(e);
-            });
-        });
-    }
-
-    showTooltip(event, text) {
-        const tooltip = document.getElementById('tooltip');
-        tooltip.textContent = text;
-        tooltip.classList.add('tooltip-visible');
-        this.positionTooltip(event);
-    }
-
-    hideTooltip() {
-        const tooltip = document.getElementById('tooltip');
-        tooltip.classList.remove('tooltip-visible');
-    }
-
-    positionTooltip(event) {
-        const tooltip = document.getElementById('tooltip');
-        const tooltipRect = tooltip.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-
-        let left = event.pageX + 10;
-        let top = event.pageY - 10;
-
-        // Adjust position if tooltip would go off screen
-        if (left + tooltipRect.width > viewportWidth) {
-            left = event.pageX - tooltipRect.width - 10;
-        }
-
-        if (top - tooltipRect.height < 0) {
-            top = event.pageY + 20;
-        }
-
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
-    }
-}
-
-// Global functions for HTML event handlers
-function refreshData() {
-    if (window.dashboard) {
-        window.dashboard.refreshData();
-    }
-}
-
-function changeForecastPage(direction) {
-    if (window.dashboard) {
-        window.dashboard.changeForecastPage(direction);
-    }
-}
-
-function toggleDailyDetails(dayIndex) {
-    const details = document.getElementById(`daily-details-${dayIndex}`);
-    const button = document.querySelector(`[onclick="toggleDailyDetails(${dayIndex})"] i`);
     
-    if (details && button) {
-        const isVisible = details.style.display === 'block';
-        details.style.display = isVisible ? 'none' : 'block';
-        button.className = isVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+    async updateForecastForTimeRange(range) {
+        let data = this.forecastData;
+        
+        if (!data || data.length === 0) {
+            data = await this.generateForecastData();
+            this.forecastData = data;
+        }
+        
+        let filteredData = data;
+        
+        switch (range) {
+            case '6h':
+                filteredData = data.slice(0, 6);
+                break;
+            case '24h':
+                filteredData = data.slice(0, 24);
+                break;
+            case '48h':
+                filteredData = data.slice(0, 48);
+                break;
+        }
+        
+        this.updateForecastWidget(filteredData);
+        await this.updateDetailedForecastTable();
+        this.updateQuickForecast();
     }
 }
-
-// Initialize dashboard when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.dashboard = new RowCastDashboard();
-});

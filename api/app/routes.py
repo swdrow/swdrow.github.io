@@ -1,7 +1,8 @@
 # app/routes.py
 
-from flask import Blueprint, jsonify, request, render_template, redirect
+from flask import Blueprint, jsonify, request, render_template, redirect, send_from_directory
 import json
+import os
 from datetime import datetime, timedelta
 import pytz
 # Import the redis_client instance from the extensions file
@@ -11,8 +12,17 @@ from app.rowcast import compute_rowcast, merge_params
 # EST timezone
 EST = pytz.timezone('America/New_York')
 
-# ... rest of the file is the same ...
 bp = Blueprint("api", __name__)
+
+@bp.after_request
+def after_request(response):
+    """Add CORS headers to all responses"""
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
+
+
 
 def get_data_from_redis(key):
     """Helper function to get and decode data from Redis."""
@@ -446,3 +456,28 @@ def api_documentation_html():
 def data_dashboard():
     """Redirect to standalone dashboard page"""
     return redirect('/dashboard.html')
+
+@bp.route("/")
+def index():
+    """Serve the main application"""
+    # In production, serve from dist directory
+    env = os.getenv('FLASK_ENV', 'development')
+    if env == 'production':
+        return send_from_directory('../dist', 'index.html')
+    else:
+        # In development, redirect to dev server
+        return redirect('http://localhost:8000')
+
+@bp.route("/<path:filename>")
+def serve_static(filename):
+    """Serve static files in production"""
+    env = os.getenv('FLASK_ENV', 'development')
+    if env == 'production':
+        try:
+            return send_from_directory('../dist', filename)
+        except:
+            # If file not found, serve index.html for SPA routing
+            return send_from_directory('../dist', 'index.html')
+    else:
+        # In development, let the dev server handle it
+        return redirect(f'http://localhost:8000/{filename}')
