@@ -1776,14 +1776,10 @@
     <script src="js/templatemo-script.js"></script>
     <!-- Load Chart.js for dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Load SPA content loader -->
-    <script src="js/spa-loader.js"></script>
-    <!-- Load dashboard script -->
-    <script src="js/dashboard-enhanced.js"></script>
-    <!-- Load enhanced data management -->
-    <!-- <script src="js/enhanced-data.js"></script> DISABLED: Conflicts with dashboard-enhanced.js -->
-    <!-- Load custom scripts after jQuery -->
-    <script src="js/scripts.js"></script>
+    <!-- Load data configuration first -->
+    <script src="js/data-config.js"></script>
+    <!-- Load unified RowCast application script -->
+    <script src="js/main.js"></script>
     
     <!-- Modern SPA Router Script -->
     <script>
@@ -1886,10 +1882,12 @@
             showSection(initialSection);
         });
         
-        // Dashboard functions
+        // Dashboard functions - delegate to main RowCastApp
         function refreshData() {
-            if (window.dashboard) {
-                window.dashboard.refreshData();
+            if (window.rowcastApp && typeof window.rowcastApp.refreshData === 'function') {
+                window.rowcastApp.refreshData();
+            } else {
+                console.log('RowCast app not ready yet');
             }
         }
         
@@ -1920,21 +1918,7 @@
         }
     </script>
     
-    <!-- Initialize functions after DOM is ready -->
-    <script>
-        $(document).ready(function() {
-            // Initialize data fetching
-            if (typeof fetchWaterData === 'function') {
-                fetchWaterData();
-            }
-            if (typeof fetchWindData === 'function') {
-                fetchWindData();
-            }
-            if (typeof checkAndLoadWindData === 'function') {
-                checkAndLoadWindData();
-            }
-        });
-    </script>
+    <!-- Data fetching is now handled by main.js RowCastApp class -->
     
     <!-- Weather Widget Script -->
     <script>

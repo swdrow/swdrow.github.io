@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RowCast Data Population Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1f2e;
+            color: white;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        .element-test {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .element-id {
+            font-family: monospace;
+            color: #00a8ff;
+        }
+        .element-value {
+            font-weight: bold;
+            color: #00b894;
+        }
+        .missing {
+            color: #dc3545;
+        }
+        .button {
+            background: #00a8ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0097e6;
+        }
+        .score-bar {
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .score-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #28a745, #17a2b8, #ffc107, #dc3545);
+        }
+    </style>
+</head>
+<body>
+    <h1>🚣 RowCast Data Population Test</h1>
+    
+    <div class="test-section">
+        <h2>Controls</h2>
+        <button class="button" onclick="testDataLoad()">🔄 Load Data</button>
+        <button class="button" onclick="testAPIDirectly()">🧪 Test API</button>
+        <button class="button" onclick="checkElements()">🔍 Check Elements</button>
+        <button class="button" onclick="clearConsole()">🧹 Clear Console</button>
+    </div>
+
+    <div class="test-section">
+        <h2>RowCast Score</h2>
+        <div class="element-test">
+            <span class="element-id">rowcast-score:</span>
+            <span id="rowcast-score" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">dashboard-score:</span>
+            <span id="dashboard-score" class="element-value">--</span>
+        </div>
+        <div class="score-bar">
+            <div id="score-fill" class="score-fill" style="width: 0%;"></div>
+        </div>
+        <div class="score-bar">
+            <div id="dashboard-score-fill" class="score-fill" style="width: 0%;"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Water Data</h2>
+        <div class="element-test">
+            <span class="element-id">R-Discharge:</span>
+            <span id="R-Discharge" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">R-Height:</span>
+            <span id="R-Height" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">R-Temp:</span>
+            <span id="R-Temp" class="element-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Weather Data</h2>
+        <div class="element-test">
+            <span class="element-id">R-WindSpeed:</span>
+            <span id="R-WindSpeed" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">R-Gusts:</span>
+            <span id="R-Gusts" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">R-Direction:</span>
+            <span id="R-Direction" class="element-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Status</h2>
+        <div class="element-test">
+            <span class="element-id">score-timestamp:</span>
+            <span id="score-timestamp" class="element-value">--</span>
+        </div>
+        <div class="element-test">
+            <span class="element-id">last-updated:</span>
+            <span id="last-updated" class="element-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <div id="console-output" style="background: #000; padding: 15px; border-radius: 4px; font-family: monospace; height: 200px; overflow-y: auto;"></div>
+    </div>
+
+    <!-- Include the actual config and main scripts -->
+    <script src="js/data-config.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function appendToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#dc3545' : type === 'warn' ? '#ffc107' : '#00b894';
+            consoleOutput.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            appendToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            appendToConsole(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            appendToConsole(args.join(' '), 'warn');
+        };
+
+        // Test functions
+        function testDataLoad() {
+            console.log('🔄 Manually triggering data load...');
+            if (window.rowcastApp) {
+                window.rowcastApp.refreshData();
+            } else {
+                console.error('❌ RowCast app not initialized');
+            }
+        }
+
+        async function testAPIDirectly() {
+            console.log('🧪 Testing API endpoints directly...');
+            
+            const endpoints = [
+                '/api/rowcast',
+                '/api/water/current', 
+                '/api/weather/current'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`📡 Testing ${endpoint}...`);
+                    const response = await fetch(endpoint);
+                    console.log(`📡 Response: ${response.status} ${response.statusText}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(`✅ ${endpoint} data:`, data);
+                    } else {
+                        console.error(`❌ ${endpoint} failed: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error(`❌ ${endpoint} error:`, error);
+                }
+            }
+        }
+
+        function checkElements() {
+            console.log('🔍 Checking element availability...');
+            
+            const elementIds = [
+                'rowcast-score', 'dashboard-score', 'score-fill', 'dashboard-score-fill',
+                'R-Discharge', 'R-Height', 'R-Temp', 'R-WindSpeed', 'R-Gusts', 'R-Direction',
+                'score-timestamp', 'last-updated'
+            ];
+            
+            elementIds.forEach(id => {
+                const element = document.getElementById(id);
+                const status = element ? '✅ Found' : '❌ Missing';
+                const value = element ? element.textContent : 'N/A';
+                console.log(`${status}: ${id} = "${value}"`);
+            });
+        }
+
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+            console.log('🧹 Console cleared');
+        }
+
+        // Initial check
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                console.log('🚀 Test page loaded');
+                checkElements();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

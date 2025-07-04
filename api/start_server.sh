@@ -33,6 +33,9 @@ echo "Activating conda environment: rowcast"
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate rowcast
 
+# Set production environment
+export FLASK_ENV=production
+
 # Verify gunicorn is available
 if ! command -v gunicorn &> /dev/null; then
     echo "❌ gunicorn not found in conda environment!"
@@ -44,12 +47,12 @@ fi
 nohup gunicorn wsgi:app \
   --bind 127.0.0.1:5000 \
   --workers 4 \
+  --threads 4 \
   --timeout 120 \
   --preload \
   --access-logfile "$LOG_FILE" \
   --error-logfile "$LOG_FILE" \
   --log-level info \
-  --capture-output \
   "$@" >> "$LOG_FILE" 2>&1 &
 
 # Save PID

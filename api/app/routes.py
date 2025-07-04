@@ -358,9 +358,8 @@ def complete_extended():
     except Exception as e:
         return jsonify({"error": f"Failed to compile extended data: {str(e)}"}), 500
 
-@bp.route("/")
-@bp.route("/docs")
 @bp.route("/api")
+@bp.route("/docs")
 def api_documentation():
     """API Documentation - Shows all available endpoints and usage"""
     docs = {

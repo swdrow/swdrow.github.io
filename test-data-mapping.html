@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RowCast Data Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .element-test { margin: 5px 0; padding: 5px; }
+        .found { background: #d4edda; }
+        .missing { background: #f8d7da; }
+        .data-value { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>RowCast Data Population Test</h1>
+    
+    <div class="test-section">
+        <h2>RowCast Score Elements</h2>
+        <div class="element-test">
+            <span>rowcast-score:</span> <span id="rowcast-score" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>dashboard-score:</span> <span id="dashboard-score" class="data-value">--</span>
+        </div>
+        <div class="score-visualization">
+            <div style="height: 20px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0;">
+                <div id="score-fill" style="height: 100%; background: #007bff; width: 0%; transition: width 0.5s ease;"></div>
+            </div>
+            <div style="height: 20px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0;">
+                <div id="dashboard-score-fill" style="height: 100%; background: #007bff; width: 0%; transition: width 0.5s ease;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Water Data Elements</h2>
+        <div class="element-test">
+            <span>R-Discharge:</span> <span id="R-Discharge" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>R-Height:</span> <span id="R-Height" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>R-Temp:</span> <span id="R-Temp" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>water-flow:</span> <span id="water-flow" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>water-level:</span> <span id="water-level" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>water-temp:</span> <span id="water-temp" class="data-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Wind/Weather Data Elements</h2>
+        <div class="element-test">
+            <span>R-WindSpeed:</span> <span id="R-WindSpeed" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>R-Gusts:</span> <span id="R-Gusts" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>R-Direction:</span> <span id="R-Direction" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>wind-speed:</span> <span id="wind-speed" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>wind-direction:</span> <span id="wind-direction" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>main-wind-speed:</span> <span id="main-wind-speed" class="data-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Status Elements</h2>
+        <div class="element-test">
+            <span>last-updated:</span> <span id="last-updated" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>score-timestamp:</span> <span id="score-timestamp" class="data-value">--</span>
+        </div>
+        <div class="element-test">
+            <span>data-timestamp:</span> <span id="data-timestamp" class="data-value">--</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>API Test</h2>
+        <button onclick="testAPI()">Test API Connection</button>
+        <div id="api-results" style="margin-top: 10px;"></div>
+    </div>
+
+    <script src="js/data-config.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        function testAPI() {
+            const resultsDiv = document.getElementById('api-results');
+            resultsDiv.innerHTML = 'Testing API...';
+            
+            Promise.all([
+                fetch('/api/rowcast').then(r => r.json()),
+                fetch('/api/water/current').then(r => r.json()),
+                fetch('/api/weather/current').then(r => r.json())
+            ])
+            .then(([rowcast, water, weather]) => {
+                resultsDiv.innerHTML = `
+                    <h4>API Results:</h4>
+                    <pre>${JSON.stringify({rowcast, water, weather}, null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = `<p style="color: red;">API Error: ${error.message}</p>`;
+            });
+        }
+        
+        // Test element availability on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.element-test').forEach(test => {
+                    const elementId = test.querySelector('.data-value').id;
+                    const element = document.getElementById(elementId);
+                    test.className = element ? 'element-test found' : 'element-test missing';
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
