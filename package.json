@@ -7,13 +7,33 @@
     "dev:api": "cd api && ./start_server.sh",
     "test:api": "cd api && python test_api.py",
     "deploy": "echo 'Deploy via Cloudflare Pages or GitHub Pages'",
-    "install:api": "cd api && pip install -r requirements.txt"
+    "install:api": "cd api && pip install -r requirements.txt",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/swdrow/swdrow.github.io.git"
+    "url": "git+https://github.com/swdrow/swdrow.github.io.git"
   },
-  "keywords": ["portfolio", "website", "rowing", "api", "weather", "conditions"],
+  "keywords": [
+    "portfolio",
+    "website",
+    "rowing",
+    "api",
+    "weather",
+    "conditions"
+  ],
   "author": "Sam Duncan",
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/swdrow/swdrow.github.io/issues"
+  },
+  "homepage": "https://github.com/swdrow/swdrow.github.io#readme",
+  "main": "server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5"
+  }
 }

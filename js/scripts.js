@@ -31,50 +31,18 @@ function windowH () {
 windowH()
 
 async function fetchWaterData () {
-  const siteId = '01474500'
-  const parameters = '00010,00065,00060' // Water temperature, gauge height, discharge
-  const url = `https://waterservices.usgs.gov/nwis/iv/?sites=${siteId}&parameterCd=${parameters}&format=json`
-
   try {
-    const response = await fetch(url)
+    // Fetch from our local API instead of USGS directly
+    const response = await fetch('/api/water/current')
     if (!response.ok) {
       throw new Error(`Error fetching data: ${response.statusText}`)
     }
     const data = await response.json()
 
-    // Initialize default values
-    let gaugeHeight = 'N/A'
-    let waterTemp = 'N/A'
-    let discharge = 'N/A'
-
-    // Extract the time series data
-    const timeSeries = data.value.timeSeries
-
-    // Loop through each time series to extract data
-    timeSeries.forEach(series => {
-      const variableName = series.variable.variableName.toLowerCase()
-      const latestValue = series.values[0]?.value[0]?.value || 'N/A'
-
-      // Check for each parameter and assign the corresponding value
-      if (variableName.includes('gage height')) {
-        gaugeHeight = latestValue
-      } else if (variableName.includes('temperature')) {
-        waterTemp = latestValue
-      } else if (
-        variableName.includes('discharge') ||
-        variableName.includes('flow')
-      ) {
-        discharge = latestValue
-      }
-    })
-
     // Update the respective containers in the HTML
-    document.getElementById('R-Height').textContent = `${gaugeHeight} ft`
-    document.getElementById('R-Temp').textContent = `${(
-      waterTemp * 1.8 +
-      32
-    ).toFixed(1)}°F`
-    document.getElementById('R-Discharge').textContent = `${discharge} ft³/s`
+    document.getElementById('R-Height').textContent = `${data.height || 'N/A'} ft`
+    document.getElementById('R-Temp').textContent = `${data.temperature || 'N/A'}°F`
+    document.getElementById('R-Discharge').textContent = `${data.flow || 'N/A'} ft³/s`
   } catch (error) {
     console.error('Error:', error)
     // Update the containers with error messages
@@ -297,18 +265,6 @@ function animateArrow (targetAngle) {
 }
 
 async function getCurrentWindData(ignoreLocalStorage = false) {
-  const apiUrl =
-    'https://api.open-meteo.com/v1/forecast?latitude=39.9696&longitude=-75.1876&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=uv_index&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York';
-  const latitude = 39.9696; // Latitude for Boathouse Row, Philadelphia
-  const longitude = -75.1876; // Longitude for Boathouse Row, Philadelphia
-  const parameters = [
-    'current_weather=true',
-    'latitude=' + latitude,
-    'longitude=' + longitude,
-    'wind_speed_unit=mph', // Use mph as the wind speed unit
-    'timezone=America/New_York'
-  ];
-
   const localStorageKey = 'currentWindData';
 
   try {
@@ -323,11 +279,8 @@ async function getCurrentWindData(ignoreLocalStorage = false) {
       }
     }
 
-    // Construct the full API URL with parameters
-    const url = `${apiUrl}`;
-
-    // Fetch data from the API
-    const response = await fetch(url);
+    // Fetch data from our local API
+    const response = await fetch('/api/weather/current');
     if (!response.ok) throw new Error('Failed to fetch wind data');
 
     // Parse the JSON response
@@ -335,10 +288,9 @@ async function getCurrentWindData(ignoreLocalStorage = false) {
     console.log(data);
 
     // Extract current weather details
-    const currentWeather = data.current;
-    const windSpeed = currentWeather.wind_speed_10m; // Wind speed in mph
-    const windGust = currentWeather.wind_gusts_10m || 'N/A'; // Wind gusts in mph, if available
-    const windDirection = currentWeather.wind_direction_10m || 'N/A';
+    const windSpeed = data.windSpeed || 0; // Wind speed in mph
+    const windGust = data.windGust || 0; // Wind gusts in mph
+    const windDirection = data.windDirection || 0;
 
     const windData = { windSpeed, windGust, windDirection };
     const timestamp = new Date().toISOString();
@@ -360,12 +312,20 @@ async function getCurrentWindData(ignoreLocalStorage = false) {
 function updateUI(data) {
   const { windSpeed, windGust, windDirection } = data;
   console.log('Updating UI with:', windSpeed, windGust, windDirection);
-  document.getElementById('R-WindSpeed').textContent = `${windSpeed.toFixed(0)} mph`;
-  document.getElementById('R-Gusts').textContent = `${windGust.toFixed(1) || 'N/A'} mph`;
-  document.getElementById('R-Direction').textContent = `${windDirection.toFixed(1) || 'N/A'}°`;
-  const windDirectionCorrection = ((windDirection + 90)%360);
-  console.log('Wind Correction:', windDirectionCorrection);
-  animateArrow(windDirectionCorrection);
+  
+  const windSpeedEl = document.getElementById('R-WindSpeed');
+  const windGustEl = document.getElementById('R-Gusts');
+  const windDirEl = document.getElementById('R-Direction');
+  
+  if (windSpeedEl) windSpeedEl.textContent = `${windSpeed ? windSpeed.toFixed(0) : 'N/A'} mph`;
+  if (windGustEl) windGustEl.textContent = `${windGust ? windGust.toFixed(1) : 'N/A'} mph`;
+  if (windDirEl) windDirEl.textContent = `${windDirection ? windDirection.toFixed(1) : 'N/A'}°`;
+  
+  if (windDirection && !isNaN(windDirection)) {
+    const windDirectionCorrection = ((windDirection + 90) % 360);
+    console.log('Wind Correction:', windDirectionCorrection);
+    animateArrow(windDirectionCorrection);
+  }
 }
 
 function handleCooldown (button, cooldownTime) {

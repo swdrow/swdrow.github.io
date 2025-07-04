@@ -1,26 +1,34 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  // Set root to parent directory to access main website files
+  root: '..',
+  
   // Development server configuration
   server: {
     port: 3000,
     host: true, // Allow external connections
-    open: true, // Auto-open browser
+    open: '/dashboard.html', // Open dashboard by default
     // Proxy API requests to Flask backend during development
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:5000', // Flask API server on port 5000
         changeOrigin: true,
         secure: false
       },
       // Also proxy direct routes that Flask handles
       '/dashboard': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false
       },
       '/docs': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false
+      },
+      '/documentation': {
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false
       }
@@ -29,25 +37,31 @@ export default defineConfig({
   
   // Build configuration for production
   build: {
-    outDir: 'dist',
+    outDir: 'api/dist',
     emptyOutDir: true,
+    sourcemap: false, // Disable sourcemaps to avoid warnings
     // Generate manifest for Flask to reference built assets
     manifest: true,
     rollupOptions: {
       input: {
         // Define entry points for your app
-        dashboard: 'app/templates/dashboard.html',
-        // Add other pages as needed
+        dashboard: 'dashboard.html',
+        documentation: 'api-documentation.html',
+        main: 'index.html'
+      },
+      onwarn(warning, warn) {
+        // Suppress source map warnings
+        if (warning.code === 'SOURCEMAP_ERROR') return;
+        warn(warning);
       }
     }
   },
   
-  // Development source file locations
-  root: '.', // Project root
-  publicDir: 'app/static', // Static assets directory
-  
   // CSS processing
   css: {
-    devSourcemap: true
-  }
+    devSourcemap: false // Disable CSS source maps to avoid warnings
+  },
+  
+  // Static assets directory
+  publicDir: 'assets'
 })

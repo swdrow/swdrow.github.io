@@ -1,6 +1,6 @@
 # app/routes.py
 
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, redirect
 import json
 from datetime import datetime, timedelta
 import pytz
@@ -438,11 +438,11 @@ def api_documentation():
 @bp.route("/docs/html")
 @bp.route("/documentation")
 def api_documentation_html():
-    """Serve beautifully formatted API documentation"""
-    return render_template('api_docs.html')
+    """Redirect to standalone API documentation page"""
+    return redirect('/api-documentation.html')
 
 @bp.route("/dashboard")
 @bp.route("/data")
 def data_dashboard():
-    """Interactive web dashboard showing all data and forecasts"""
-    return render_template('dashboard.html')
+    """Redirect to standalone dashboard page"""
+    return redirect('/dashboard.html')

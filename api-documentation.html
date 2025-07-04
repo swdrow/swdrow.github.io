@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RowCast API Documentation</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .docs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+        }
+        
+        .docs-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem 0;
+            background: var(--gradient-secondary);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .docs-header h1 {
+            color: var(--accent-tertiary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .docs-header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        .base-url {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            color: var(--accent-tertiary);
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .endpoint-section {
+            margin-bottom: 3rem;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .section-title {
+            color: var(--text-primary);
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-primary);
+        }
+        
+        .endpoint-card {
+            background: var(--bg-tertiary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .endpoint-card:hover {
+            background: var(--bg-quaternary);
+            transform: translateX(4px);
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+        
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--accent-tertiary);
+            margin-bottom: 1rem;
+        }
+        
+        .endpoint-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .parameter-list {
+            margin-top: 1rem;
+        }
+        
+        .parameter-list h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .parameter-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .parameter-name {
+            font-family: 'Courier New', monospace;
+            color: var(--accent-tertiary);
+            font-weight: 600;
+            min-width: 150px;
+            margin-right: 1rem;
+        }
+        
+        .parameter-description {
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        
+        .status-200 { background: var(--success-color); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+        .status-400 { background: var(--warning-color); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+        .status-500 { background: var(--danger-color); color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
+        
+        .example-response {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .try-button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .try-button:hover {
+            background: var(--accent-secondary);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent-tertiary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="docs-container">
+        <a href="dashboard.html" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        
+        <div class="docs-header">
+            <h1><i class="fas fa-water"></i> RowCast API Documentation</h1>
+            <p>Real-time rowing conditions and forecast data</p>
+            <div class="base-url">
+                Base URL: <span id="base-url">https://api.samwduncan.com</span>
+            </div>
+        </div>
+
+        <!-- Weather Endpoints -->
+        <section class="endpoint-section">
+            <h2 class="section-title">Weather Endpoints</h2>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/weather</div>
+                <div class="endpoint-description">
+                    Retrieve complete current weather data including temperature, wind conditions, humidity, and atmospheric pressure.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/weather')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/weather/current</div>
+                <div class="endpoint-description">
+                    Get current weather summary with essential conditions for quick reference.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/weather/current')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/weather/forecast</div>
+                <div class="endpoint-description">
+                    Weather forecast data for upcoming conditions planning.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/weather/forecast')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/weather/extended</div>
+                <div class="endpoint-description">
+                    Extended weather forecast with detailed hourly and daily predictions.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/weather/extended')">Try it</button>
+            </div>
+        </section>
+
+        <!-- Water Endpoints -->
+        <section class="endpoint-section">
+            <h2 class="section-title">Water Conditions</h2>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/water</div>
+                <div class="endpoint-description">
+                    Complete water conditions including level, flow rate, and temperature data.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/water')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/water/current</div>
+                <div class="endpoint-description">
+                    Current water level and flow conditions for immediate reference.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/water/current')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/water/predictions</div>
+                <div class="endpoint-description">
+                    Predicted water conditions and level changes.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/water/predictions')">Try it</button>
+            </div>
+        </section>
+
+        <!-- RowCast Endpoints -->
+        <section class="endpoint-section">
+            <h2 class="section-title">RowCast Scoring</h2>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/rowcast</div>
+                <div class="endpoint-description">
+                    Current RowCast score based on all weather and water conditions.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/rowcast')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/rowcast/forecast</div>
+                <div class="endpoint-description">
+                    RowCast scores for upcoming time periods with detailed conditions.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/rowcast/forecast')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/rowcast/forecast/simple</div>
+                <div class="endpoint-description">
+                    Simplified forecast with timestamps and scores only.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/rowcast/forecast/simple')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/rowcast/forecast/short-term</div>
+                <div class="endpoint-description">
+                    Next 24 hours of RowCast scores with detailed analysis.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/rowcast/forecast/short-term')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/rowcast/forecast/extended</div>
+                <div class="endpoint-description">
+                    Extended forecast showing conditions for the next several days.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/rowcast/forecast/extended')">Try it</button>
+            </div>
+        </section>
+
+        <!-- NOAA Data -->
+        <section class="endpoint-section">
+            <h2 class="section-title">NOAA River Data</h2>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/noaa/stageflow</div>
+                <div class="endpoint-description">
+                    Complete NOAA stage and flow data for the Schuylkill River.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/noaa/stageflow')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/noaa/stageflow/current</div>
+                <div class="endpoint-description">
+                    Current river stage and flow readings from NOAA gauges.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/noaa/stageflow/current')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/noaa/stageflow/forecast</div>
+                <div class="endpoint-description">
+                    NOAA river level and flow forecasts.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/noaa/stageflow/forecast')">Try it</button>
+            </div>
+        </section>
+
+        <!-- Complete Data -->
+        <section class="endpoint-section">
+            <h2 class="section-title">Complete Data</h2>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/complete</div>
+                <div class="endpoint-description">
+                    All current conditions and short-term forecasts in a single comprehensive response.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/complete')">Try it</button>
+            </div>
+            
+            <div class="endpoint-card">
+                <div class="endpoint-method">GET</div>
+                <div class="endpoint-path">/api/complete/extended</div>
+                <div class="endpoint-description">
+                    All data including extended forecasts and NOAA stageflow for comprehensive dashboard use.
+                </div>
+                <button class="try-button" onclick="tryEndpoint('/api/complete/extended')">Try it</button>
+            </div>
+        </section>
+
+        <!-- Scoring Algorithm -->
+        <section class="endpoint-section">
+            <h2 class="section-title">RowCast Scoring Algorithm</h2>
+            
+            <div class="parameter-list">
+                <h4>Primary Factors (Most Important):</h4>
+                <div class="parameter-item">
+                    <span class="parameter-name">Wind Speed</span>
+                    <div class="parameter-description">Lower wind speeds score higher (primary factor)</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">Wind Direction</span>
+                    <div class="parameter-description">Headwinds and tailwinds preferred over crosswinds</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">Water Level</span>
+                    <div class="parameter-description">Optimal range for safe navigation and speed</div>
+                </div>
+            </div>
+            
+            <div class="parameter-list">
+                <h4>Secondary Factors:</h4>
+                <div class="parameter-item">
+                    <span class="parameter-name">Temperature</span>
+                    <div class="parameter-description">Comfortable range for athletic performance</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">Humidity</span>
+                    <div class="parameter-description">Moderate levels preferred for comfort</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">Visibility</span>
+                    <div class="parameter-description">Clear conditions for safety</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">UV Index</span>
+                    <div class="parameter-description">Moderate UV levels (safety consideration)</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name">Safety Alerts</span>
+                    <div class="parameter-description">Weather warnings, visibility, lightning potential</div>
+                </div>
+            </div>
+            
+            <div class="parameter-list">
+                <h4>Score Interpretation:</h4>
+                <div class="parameter-item">
+                    <span class="parameter-name status-200">8.0 - 10.0</span>
+                    <div class="parameter-description">Excellent rowing conditions</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name status-200">6.0 - 7.9</span>
+                    <div class="parameter-description">Good conditions with minor considerations</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name status-400">4.0 - 5.9</span>
+                    <div class="parameter-description">Fair conditions - exercise caution</div>
+                </div>
+                <div class="parameter-item">
+                    <span class="parameter-name status-500">0.0 - 3.9</span>
+                    <div class="parameter-description">Poor conditions - not recommended</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Response Modal -->
+    <div id="response-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-secondary); border-radius: 1rem; padding: 2rem; max-width: 90%; max-height: 90%; overflow-y: auto; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--text-primary);">API Response</h3>
+                <button onclick="closeModal()" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <pre id="response-content" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1rem; overflow-x: auto; color: var(--text-primary); font-family: 'Courier New', monospace; font-size: 0.9rem;"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Set the base URL dynamically
+        document.getElementById('base-url').textContent = window.location.origin;
+        
+        async function tryEndpoint(endpoint) {
+            const modal = document.getElementById('response-modal');
+            const content = document.getElementById('response-content');
+            
+            try {
+                modal.style.display = 'flex';
+                content.textContent = 'Loading...';
+                
+                const response = await fetch(window.location.origin + endpoint);
+                const data = await response.json();
+                content.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                content.textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('response-modal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('response-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

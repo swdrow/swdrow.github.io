@@ -1,6 +1,6 @@
 {
-  "command": "npm run dev",
-  "serverUrl": "http://localhost:3000",
+  "command": "npm run dev:full",
+  "serverUrl": "http://localhost:3002",
   "authenticateProxy": false,
   "commitMode": "commits"
 }

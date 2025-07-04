@@ -28,11 +28,22 @@ fi
 pkill -f "gunicorn wsgi:app" 2>/dev/null || true
 sleep 1
 
+# Activate conda environment
+echo "Activating conda environment: rowcast"
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate rowcast
+
+# Verify gunicorn is available
+if ! command -v gunicorn &> /dev/null; then
+    echo "❌ gunicorn not found in conda environment!"
+    echo "Installing gunicorn..."
+    conda install -c conda-forge gunicorn -y
+fi
+
 # Start server with nohup
 nohup gunicorn wsgi:app \
-  --bind 0.0.0.0:8000 \
-  --workers 1 \
-  --threads 4 \
+  --bind 127.0.0.1:5000 \
+  --workers 4 \
   --timeout 120 \
   --preload \
   --access-logfile "$LOG_FILE" \
@@ -53,8 +64,8 @@ echo "To stop server: ./stop_server.sh"
 sleep 3
 if ps -p "$PID" > /dev/null 2>&1; then
     echo "✅ Server is running successfully!"
-    echo "API available at: http://localhost:8000"
-    echo "Documentation: http://localhost:8000/docs"
+    echo "API available at: http://localhost:5000"
+    echo "Documentation: http://localhost:5000/docs"
 else
     echo "❌ Server failed to start. Check logs: $LOG_FILE"
     exit 1

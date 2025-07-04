@@ -1,6 +1,7 @@
 # app/__init__.py
 
 from flask import Flask
+from flask_cors import CORS
 # Import instances from our new extensions file
 from app.extensions import scheduler, redis_client
 from app.routes import bp
@@ -12,6 +13,9 @@ def create_app():
     Application factory: creates and configures the Flask app.
     """
     app = Flask(__name__)
+    
+    # Enable CORS for all routes
+    CORS(app, origins=["http://localhost:8000", "http://localhost:8001"])
     
     # Configuration for development vs production
     env = os.getenv('FLASK_ENV', 'development')
