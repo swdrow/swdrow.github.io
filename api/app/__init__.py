@@ -44,7 +44,8 @@ def create_app():
         "https://samwduncan.com",
         "https://www.samwduncan.com"
     ]
-    CORS(app, origins=allowed_origins)
+    # Temporarily allow all origins for debugging
+    CORS(app, origins="*")
     
     # Configuration for development vs production
     env = os.getenv('FLASK_ENV', 'development')
