@@ -256,8 +256,8 @@ class DashboardManager {
         const scoreElement = document.getElementById('current-rowcast-score');
         const fillBar = document.getElementById('score-fill-bar');
         
-        if (scoreElement && data.current && data.current.rowcastScore !== undefined) {
-            const score = data.current.rowcastScore;
+        if (scoreElement && data.current && data.current.rowcast && data.current.rowcast.score !== undefined) {
+            const score = data.current.rowcast.score;
             scoreElement.textContent = score.toFixed(1);
             scoreElement.className = `text-6xl font-bold mb-4 ${this.getScoreColor(score)}`;
             
@@ -390,7 +390,7 @@ class DashboardManager {
                     const time = new Date(item.timestamp);
                     const hour = time.getHours();
                     const displayTime = hour === 0 ? '12 AM' : hour <= 12 ? `${hour} AM` : `${hour - 12} PM`;
-                    const score = item.score || 0;
+                    const score = (item.score && item.score.score !== undefined) ? item.score.score : item.score || 0;
                     const conditions = item.conditions || {};
                     
                     return `
@@ -456,7 +456,7 @@ class DashboardManager {
                                                  onclick="window.dashboardManager.toggleRowcastTooltip(${index}, ${hourIndex}, event)"
                                                  data-hour-index="${hourIndex}">
                                                 <div class="text-xs text-glass-muted mb-1">${hourDisplay}</div>
-                                                <div class="text-lg font-bold mb-1 ${this.getScoreColor(hour.score)}">${hour.score.toFixed(1)}</div>
+                                                <div class="text-lg font-bold mb-1 ${this.getScoreColor((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0)}">${((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0).toFixed(1)}</div>
                                                 <div class="text-xs text-blue-400 mb-1">${Math.round(hour.conditions.windSpeed || 0)} mph</div>
                                                 <div class="text-xs text-teal-400">${Math.round(hour.conditions.discharge || 0)} cfs</div>
                                             </div>
@@ -504,7 +504,8 @@ class DashboardManager {
             
             // Also collect for averages
             const conditions = item.conditions || {};
-            dailyGroups[dateKey].scores.push(item.score || 0);
+            const score = (item.score && item.score.score !== undefined) ? item.score.score : item.score || 0;
+            dailyGroups[dateKey].scores.push(score);
             dailyGroups[dateKey].temps.push(conditions.apparentTemp || 0);
             dailyGroups[dateKey].apparentTemps.push(conditions.apparentTemp || 0);
             dailyGroups[dateKey].winds.push(conditions.windSpeed || 0);
@@ -576,7 +577,7 @@ class DashboardManager {
                 hour12: true
             })}</div>
             <div class="text-center mb-3">
-                <div class="text-2xl font-bold ${this.getScoreColor(hourData.score)}">${hourData.score.toFixed(1)}</div>
+                <div class="text-2xl font-bold ${this.getScoreColor((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0)}">${((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0).toFixed(1)}</div>
                 <div class="text-xs text-glass-muted">RowCast Score</div>
             </div>
             <div class="grid grid-cols-2 gap-3 text-xs">
@@ -791,7 +792,7 @@ class DashboardManager {
                 return time.getHours() + ':00';
             });
             
-            const scores = forecastData.slice(0, 24).map(item => item.score || 0);
+            const scores = forecastData.slice(0, 24).map(item => (item.score && item.score.score !== undefined) ? item.score.score : item.score || 0);
             
             if (this.rowcastChart) {
                 this.rowcastChart.data.labels = labels;

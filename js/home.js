@@ -198,9 +198,9 @@ class HomeManager {
     updateCurrentStatus(data) {
         // Update RowCast score
         const scoreElement = document.getElementById('current-score');
-        if (scoreElement && data.current && data.current.rowcastScore !== undefined) {
-            scoreElement.textContent = data.current.rowcastScore.toFixed(1);
-            scoreElement.className = `text-3xl font-bold mb-2 ${this.getScoreColor(data.current.rowcastScore)}`;
+        if (scoreElement && data.current && data.current.rowcast && data.current.rowcast.score !== undefined) {
+            scoreElement.textContent = data.current.rowcast.score.toFixed(1);
+            scoreElement.className = `text-3xl font-bold mb-2 ${this.getScoreColor(data.current.rowcast.score)}`;
         }
 
         // Update temperature
