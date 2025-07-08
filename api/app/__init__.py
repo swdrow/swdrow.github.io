@@ -22,6 +22,7 @@ def create_app():
         "http://localhost:3000",
         "http://localhost:3001", 
         "http://localhost:3002",
+        "https://swd-1cx.pages.dev",
         "https://api.samwduncan.com",
         "https://samwduncan.com",
         "https://www.samwduncan.com"
