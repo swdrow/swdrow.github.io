@@ -1,1971 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>SWD - Weather & Water Data Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link href="fontawesome/css/all.min.css" rel="stylesheet" />
-    <link href="css/templatemo-diagoona.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>RowCast - Advanced Rowing Weather Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Advanced Liquid Glass Design System */
         :root {
-            --primary-dark: #0a0f1c;
-            --secondary-dark: #1a1f2e;
-            --tertiary-dark: #252b3b;
-            --accent-blue: #00a8ff;
-            --accent-purple: #6c5ce7;
-            --accent-green: #00b894;
-            --accent-orange: #fdcb6e;
-            --text-primary: #ffffff;
-            --text-secondary: #b2b9c7;
-            --text-muted: #74839a;
-            --border-color: #2d3748;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --gradient-primary: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            --gradient-secondary: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
-            --shadow-primary: 0 20px 40px rgba(0, 0, 0, 0.3);
-            --shadow-secondary: 0 8px 24px rgba(0, 0, 0, 0.2);
+            /* Primary Background - Deep charcoal with cool tint */
+            --bg-primary: #0a0b0f;
+            --bg-secondary: #12141a;
+            --bg-tertiary: #1a1d24;
+            
+            /* Liquid Glass Properties */
+            --glass-bg-light: rgba(255, 255, 255, 0.03);
+            --glass-bg-medium: rgba(255, 255, 255, 0.06);
+            --glass-bg-heavy: rgba(255, 255, 255, 0.09);
+            --glass-border-subtle: rgba(255, 255, 255, 0.08);
+            --glass-border-visible: rgba(255, 255, 255, 0.12);
+            --glass-blur-light: blur(12px);
+            --glass-blur-medium: blur(20px);
+            --glass-blur-heavy: blur(32px);
+            
+            /* Specular Highlights */
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --glass-highlight-active: rgba(255, 255, 255, 0.25);
+            
+            /* Desaturated Accent Colors */
+            --accent-blue: #4a90e2;
+            --accent-blue-muted: #2d5aa0;
+            --accent-purple: #7b68ee;
+            --accent-purple-muted: #5d4e8c;
+            --accent-teal: #4fd1c7;
+            --accent-teal-muted: #2d8b85;
+            --success-green: #22c55e;
+            --warning-orange: #f59e0b;
+            --error-red: #ef4444;
+            
+            /* Typography Colors */
+            --text-primary: rgba(255, 255, 255, 0.92);
+            --text-secondary: rgba(255, 255, 255, 0.70);
+            --text-tertiary: rgba(255, 255, 255, 0.50);
+            --text-accent: var(--accent-blue);
+            
+            /* Shadows & Depth */
+            --shadow-glass-light: 0 4px 16px rgba(0, 0, 0, 0.25);
+            --shadow-glass-medium: 0 8px 32px rgba(0, 0, 0, 0.35);
+            --shadow-glass-heavy: 0 16px 64px rgba(0, 0, 0, 0.45);
+            --inner-glow: inset 0 1px 0 var(--glass-highlight);
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+        
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-dark);
+            font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
             overflow-x: hidden;
+            font-weight: 400;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-
-        /* Modern Glass Navigation */
-        .modern-nav {
+        
+        /* Enhanced Background System */
+        .background-container {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(10, 15, 28, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient-primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 1rem;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-item {
-            position: relative;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-
-        .nav-link.active {
-            color: var(--text-primary);
-            background: var(--gradient-primary);
-            box-shadow: var(--shadow-secondary);
-        }
-
-        .mobile-toggle {
-            display: none;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 0.75rem;
-            border-radius: 10px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Main Content Container */
-        .main-container {
-            min-height: 100vh;
-            padding-top: 100px;
-            position: relative;
-        }
-
-        /* Section Styles */
-        .content-section {
-            min-height: calc(100vh - 100px);
-            padding: 2rem;
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-        }
-
-        .content-section.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            text-align: center;
-            padding: 4rem 0;
-            margin-bottom: 3rem;
-        }
-
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-primary);
-            border-color: var(--accent-blue);
-        }
-
-        /* Weather Widget Container */
-        .weather-container {
-            position: relative;
-            margin-bottom: 3rem;
-        }
-
-        .weather-widget {
             width: 100%;
-            border-radius: 20px;
+            height: 100%;
+            z-index: -10;
             overflow: hidden;
-            box-shadow: var(--shadow-secondary);
         }
-
-        /* River Data Section */
-        .river-data-section {
-            margin-bottom: 3rem;
+        
+        .background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+            filter: saturate(0.7) brightness(0.4);
         }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        
+        .background-layer.active {
+            opacity: 0.25;
         }
-
-        .title-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient-secondary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
+        
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(74, 144, 226, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(123, 104, 238, 0.03) 0%, transparent 50%),
+                linear-gradient(135deg, var(--bg-primary) 0%, rgba(18, 20, 26, 0.95) 50%, var(--bg-primary) 100%);
         }
-
-        .river-data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .data-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
+        
+        /* Core Liquid Glass System */
+        .glass-panel {
+            background: var(--glass-bg-medium);
+            backdrop-filter: var(--glass-blur-medium);
+            -webkit-backdrop-filter: var(--glass-blur-medium);
+            border: 1px solid var(--glass-border-subtle);
+            box-shadow: var(--shadow-glass-medium), var(--inner-glow);
             position: relative;
+            border-radius: 24px;
             overflow: hidden;
         }
-
-        .data-card::before {
+        
+        .glass-panel::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-
-        .data-card:hover {
-            transform: translateY(-3px);
-            background: rgba(0, 168, 255, 0.1);
-        }
-
-        .data-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.5rem;
-        }
-
-        .data-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1;
-        }
-
-        /* Wind Animation Container */
-        .wind-animation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .wind-gif {
-            width: 80px;
-            height: 50px;
-            border-radius: 10px;
-            filter: drop-shadow(0 4px 12px rgba(0, 168, 255, 0.3));
-        }
-
-        /* Action Button */
-        .action-button {
-            background: var(--gradient-primary);
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-secondary);
-            display: block;
-            margin: 2rem auto;
-            min-width: 200px;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-primary);
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-        }
-
-        .action-button:disabled {
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--glass-highlight) 20%, 
+                var(--glass-highlight) 80%, 
+                transparent 100%);
             opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
-
-        /* Dashboard Styles */
-        .dashboard-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-dark);
-            z-index: 999;
-            display: none;
-        }
-
-        .dashboard-header {
-            background: var(--secondary-dark);
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .dashboard-content {
-            padding: 2rem;
-            height: calc(100vh - 80px);
-            overflow-y: auto;
-        }
-
-        /* API Documentation Styles */
-        .api-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-dark);
-            z-index: 999;
-            display: none;
-            overflow-y: auto;
-        }
-
-        .api-header {
-            background: var(--secondary-dark);
-            padding: 2rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .api-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        /* External Link Indicator */
-        .external-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .external-link:hover {
-            color: var(--accent-purple);
-            text-decoration: none;
-        }
-
-        /* Background Controls */
-        .bg-controls {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 900;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .bg-control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 2px solid var(--glass-border);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .bg-control.active {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 20px rgba(0, 168, 255, 0.5);
-        }
-
-        /* Score Badge Styles */
-        .score-badge {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-            border-radius: 4px;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .score-excellent {
-            background: linear-gradient(135deg, #00b894, #00a085);
-            box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
-        }
-
-        .score-good {
-            background: linear-gradient(135deg, #00a8ff, #0078d4);
-            box-shadow: 0 2px 8px rgba(0, 168, 255, 0.3);
-        }
-
-        .score-fair {
-            background: linear-gradient(135deg, #fdcb6e, #e17055);
-            box-shadow: 0 2px 8px rgba(253, 203, 110, 0.3);
-        }
-
-        .score-poor {
-            background: linear-gradient(135deg, #fd79a8, #e84393);
-            box-shadow: 0 2px 8px rgba(253, 121, 168, 0.3);
-        }
-
-        .score-dangerous {
-            background: linear-gradient(135deg, #d63031, #b33030);
-            box-shadow: 0 2px 8px rgba(214, 48, 49, 0.3);
-        }
-
-        /* Wind Arrow Animations */
-        .wind-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .wind-arrow svg {
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-        }
-
-        .wind-speed-label {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 10px;
-            white-space: nowrap;
-            pointer-events: none;
-        }
-
-        /* Loading States */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .loading-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .loading-overlay .loading-spinner {
-            text-align: center;
-            color: var(--text-primary);
-        }
-
-        .loading-overlay .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--accent-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-dark);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        /* Modern Glass Navigation */
-        .modern-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(10, 15, 28, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient-primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 1rem;
-            list-style: none;
-            align-items: center;
-        }
-
-        .nav-item {
-            position: relative;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .nav-link:hover {
-            color: var(--text-primary);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            transform: translateY(-2px);
-            text-decoration: none;
-        }
-
-        .nav-link.active {
-            color: var(--text-primary);
-            background: var(--gradient-primary);
-            box-shadow: var(--shadow-secondary);
-        }
-
-        .mobile-toggle {
-            display: none;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 0.75rem;
-            border-radius: 10px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Main Content Container */
-        .main-container {
-            min-height: 100vh;
-            padding-top: 100px;
-            position: relative;
-        }
-
-        /* Section Styles */
-        .content-section {
-            min-height: calc(100vh - 100px);
-            padding: 2rem;
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-        }
-
-        .content-section.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .section-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            text-align: center;
-            padding: 4rem 0;
-            margin-bottom: 3rem;
-        }
-
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-primary);
-            border-color: var(--accent-blue);
-        }
-
-        /* Weather Widget Container */
-        .weather-container {
-            position: relative;
-            margin-bottom: 3rem;
-        }
-
-        .weather-widget {
-            width: 100%;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow-secondary);
-        }
-
-        /* River Data Section */
-        .river-data-section {
-            margin-bottom: 3rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .title-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient-secondary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .river-data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .data-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .data-card::before {
+        
+        .glass-panel::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: var(--gradient-primary);
-        }
-
-        .data-card:hover {
-            transform: translateY(-3px);
-            background: rgba(0, 168, 255, 0.1);
-        }
-
-        .data-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.5rem;
-        }
-
-        .data-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1;
-        }
-
-        /* Wind Animation Container */
-        .wind-animation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .wind-gif {
-            width: 80px;
-            height: 50px;
-            border-radius: 10px;
-            filter: drop-shadow(0 4px 12px rgba(0, 168, 255, 0.3));
-        }
-
-        /* Action Button */
-        .action-button {
-            background: var(--gradient-primary);
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-secondary);
-            display: block;
-            margin: 2rem auto;
-            min-width: 200px;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-primary);
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
-        }
-
-        .action-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Dashboard Styles */
-        .dashboard-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-dark);
-            z-index: 999;
-            display: none;
-        }
-
-        .dashboard-header {
-            background: var(--secondary-dark);
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dashboard-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .dashboard-content {
-            padding: 2rem;
-            height: calc(100vh - 80px);
-            overflow-y: auto;
-        }
-
-        /* API Documentation Styles */
-        .api-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-dark);
-            z-index: 999;
-            display: none;
-            overflow-y: auto;
-        }
-
-        .api-header {
-            background: var(--secondary-dark);
-            padding: 2rem;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .api-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        /* External Link Indicator */
-        .external-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .external-link:hover {
-            color: var(--accent-purple);
-            text-decoration: none;
-        }
-
-        /* Background Controls */
-        .bg-controls {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 900;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .bg-control {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 2px solid var(--glass-border);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .bg-control.active {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 20px rgba(0, 168, 255, 0.5);
-        }
-
-        /* Score Badge Styles */
-        .score-badge {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-            border-radius: 4px;
-            color: white;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .score-excellent {
-            background: linear-gradient(135deg, #00b894, #00a085);
-            box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
-        }
-
-        .score-good {
-            background: linear-gradient(135deg, #00a8ff, #0078d4);
-            box-shadow: 0 2px 8px rgba(0, 168, 255, 0.3);
-        }
-
-        .score-fair {
-            background: linear-gradient(135deg, #fdcb6e, #e17055);
-            box-shadow: 0 2px 8px rgba(253, 203, 110, 0.3);
-        }
-
-        .score-poor {
-            background: linear-gradient(135deg, #fd79a8, #e84393);
-            box-shadow: 0 2px 8px rgba(253, 121, 168, 0.3);
-        }
-
-        .score-dangerous {
-            background: linear-gradient(135deg, #d63031, #b33030);
-            box-shadow: 0 2px 8px rgba(214, 48, 49, 0.3);
-        }
-
-        /* Wind Arrow Animations */
-        .wind-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .wind-arrow svg {
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-        }
-
-        .wind-speed-label {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 10px;
-            white-space: nowrap;
+            bottom: 0;
+            background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(255, 255, 255, 0.02), 
+                transparent 40%);
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
             pointer-events: none;
         }
-
-        /* Loading States */
-        .loading-overlay {
-            position: fixed;
+        
+        .glass-panel:hover::after {
+            opacity: 1;
+        }
+        
+        /* Interactive Glass Elements */
+        .glass-interactive {
+            background: var(--glass-bg-light);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 16px;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .glass-interactive:hover {
+            background: var(--glass-bg-medium);
+            border-color: var(--glass-border-visible);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-glass-medium);
+        }
+        
+        .glass-interactive:active {
+            transform: translateY(0);
+            background: var(--glass-bg-heavy);
+            box-shadow: var(--shadow-glass-light);
+        }
+        
+        /* Ripple Effect for Interactive Elements */
+        .glass-interactive::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--glass-highlight) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease-out, height 0.6s ease-out;
+            pointer-events: none;
+        }
+        
+        .glass-interactive:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Enhanced Navigation */
+        .nav-glass {
+            background: rgba(10, 11, 15, 0.85);
+            backdrop-filter: var(--glass-blur-medium);
+            -webkit-backdrop-filter: var(--glass-blur-medium);
+            border-bottom: 1px solid var(--glass-border-subtle);
+            transition: all var(--transition-smooth);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        /* Dynamic Navigation Behavior */
+        .nav-glass.nav-scrolled {
+            background: rgba(10, 11, 15, 0.95);
+            backdrop-filter: var(--glass-blur-heavy);
+            -webkit-backdrop-filter: var(--glass-blur-heavy);
+            padding: 0.75rem 0;
+        }
+        
+        .nav-button {
+            background: var(--glass-bg-light);
+            border: 1px solid var(--glass-border-subtle);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            transition: all var(--transition-smooth);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-button:hover {
+            background: var(--glass-bg-medium);
+            border-color: var(--accent-blue-muted);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+        }
+        
+        .nav-button.active {
+            background: linear-gradient(135deg, var(--accent-blue-muted) 0%, var(--accent-purple-muted) 100%);
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
+        }
+        
+        /* Enhanced Widget Glass */
+        .widget-glass {
+            background: linear-gradient(135deg, 
+                var(--glass-bg-medium) 0%, 
+                var(--glass-bg-light) 100%);
+            backdrop-filter: var(--glass-blur-medium);
+            -webkit-backdrop-filter: var(--glass-blur-medium);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 20px;
+            box-shadow: var(--shadow-glass-medium), var(--inner-glow);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-smooth);
+        }
+        
+        .widget-glass:hover {
+            background: linear-gradient(135deg, 
+                var(--glass-bg-heavy) 0%, 
+                var(--glass-bg-medium) 100%);
+            border-color: var(--glass-border-visible);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glass-heavy), var(--inner-glow);
+        }
+        
+        /* Enhanced Card Containers */
+        .glass-card {
+            background: var(--bg-secondary);
+            backdrop-filter: var(--glass-blur-medium);
+            -webkit-backdrop-filter: var(--glass-blur-medium);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 28px;
+            box-shadow: var(--shadow-glass-medium);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-card::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--glass-highlight) 50%, 
+                transparent 100%);
         }
-
-        .loading-overlay.show {
-            opacity: 1;
-            visibility: visible;
+        
+        /* Score Bar Enhanced */
+        .score-bar-glass {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border-subtle);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            border-radius: 50px;
+            overflow: hidden;
+            position: relative;
         }
-
-        .loading-overlay .loading-spinner {
-            text-align: center;
-            color: var(--text-primary);
+        
+        .score-fill {
+            background: linear-gradient(90deg, 
+                var(--error-red) 0%, 
+                var(--warning-orange) 50%, 
+                var(--success-green) 100%);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.4);
+            border-radius: 50px;
+            transition: width var(--transition-slow);
+            position: relative;
         }
-
-        .loading-overlay .spinner {
+        
+        .score-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent 100%);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        /* Enhanced Loading Spinner */
+        .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--border-color);
+            border: 3px solid var(--glass-border-subtle);
             border-top: 3px solid var(--accent-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            backdrop-filter: var(--glass-blur-light);
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
+        
+        /* Typography Enhancements */
+        .text-glass {
+            color: var(--text-primary);
+        }
+        
+        .text-glass-muted {
+            color: var(--text-secondary);
+        }
+        
+        .text-glass-subtle {
+            color: var(--text-tertiary);
+        }
+        
+        /* Button Enhancements */
+        button, .btn {
+            background: var(--glass-bg-light);
+            border: 1px solid var(--glass-border-subtle);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            transition: all var(--transition-smooth);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        button:hover, .btn:hover {
+            background: var(--glass-bg-medium);
+            border-color: var(--glass-border-visible);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-glass-light);
+        }
+        
+        button:active, .btn:active {
+            transform: translateY(0);
+            background: var(--glass-bg-heavy);
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-bg-medium);
+            border-radius: 4px;
+            border: 1px solid var(--glass-border-subtle);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--glass-bg-heavy);
+        }
+        
+        /* Responsive Typography */
         @media (max-width: 768px) {
-            .mobile-toggle {
-                display: block;
+            .nav-glass {
+                padding: 0.5rem 0;
             }
-
-            .nav-menu {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(10, 15, 28, 0.95);
-                backdrop-filter: blur(20px);
-                flex-direction: column;
-                padding: 1rem;
-                border-top: 1px solid var(--glass-border);
-                transform: translateY(-100%);
-                opacity: 0;
-                visibility: hidden;
-                transition: all 0.3s ease;
+            
+            .glass-panel {
+                border-radius: 20px;
             }
-
-            .nav-menu.active {
-                transform: translateY(0);
-                opacity: 1;
-                visibility: visible;
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .river-data-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
-            }
-
-            .data-card {
-                padding: 1rem;
-            }
-
-            .data-value {
-                font-size: 2rem;
+            
+            .widget-glass {
+                border-radius: 16px;
             }
         }
-
-        @media (max-width: 480px) {
-            .river-data-grid {
-                grid-template-columns: 1fr;
+        
+        /* Performance Optimizations */
+        .glass-panel,
+        .widget-glass,
+        .nav-glass,
+        .glass-interactive {
+            will-change: transform, background, border-color;
+        }
+        
+        /* Accessibility Enhancements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
-
-            .nav-container {
-                padding: 0 1rem;
+        }
+        
+        /* Focus States */
+        button:focus,
+        .nav-button:focus,
+        .glass-interactive:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+        
+        /* Color Harmony Enhancements */
+        .text-blue-400 { color: var(--accent-blue) !important; }
+        .text-purple-400 { color: var(--accent-purple) !important; }
+        .text-teal-400 { color: var(--accent-teal) !important; }
+        .text-green-400 { color: var(--success-green) !important; }
+        .text-yellow-400 { color: var(--warning-orange) !important; }
+        .text-red-400 { color: var(--error-red) !important; }
+        .text-orange-400 { color: var(--warning-orange) !important; }
+        .text-indigo-400 { color: var(--accent-purple) !important; }
+        
+        /* Enhanced Liquid Glass Variants */
+        .glass-subtle {
+            background: var(--glass-bg-light);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 16px;
+        }
+        
+        .glass-elevated {
+            background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur-heavy);
+            -webkit-backdrop-filter: var(--glass-blur-heavy);
+            border: 1px solid var(--glass-border-visible);
+            border-radius: 24px;
+            box-shadow: var(--shadow-glass-heavy);
+        }
+        
+        /* Dynamic Content Refraction */
+        .content-behind-glass {
+            filter: blur(0.5px) brightness(0.9);
+            transition: filter var(--transition-smooth);
+        }
+        
+        .nav-glass:hover .content-behind-glass {
+            filter: blur(1px) brightness(0.8);
+        }
+        
+        /* Glassmorphism input fields */
+        input, textarea, select {
+            background: var(--glass-bg-light);
+            border: 1px solid var(--glass-border-subtle);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            backdrop-filter: var(--glass-blur-light);
+            -webkit-backdrop-filter: var(--glass-blur-light);
+            transition: all var(--transition-smooth);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            background: var(--glass-bg-medium);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            outline: none;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        /* Enhanced hover effects for cards */
+        .glass-panel:hover,
+        .widget-glass:hover,
+        .glass-card:hover {
+            border-color: var(--glass-border-visible);
+        }
+        
+        /* Liquid animation for loading states */
+        .liquid-pulse {
+            animation: liquidPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes liquidPulse {
+            0%, 100% {
+                background: var(--glass-bg-light);
+                border-color: var(--glass-border-subtle);
             }
-
-            .main-container {
-                padding-top: 90px;
+            50% {
+                background: var(--glass-bg-medium);
+                border-color: var(--glass-border-visible);
             }
-
-            .content-section {
-                padding: 1rem;
+        }
+        
+        /* Enhanced glassmorphism for modal overlays */
+        .modal-overlay {
+            background: rgba(10, 11, 15, 0.8);
+            backdrop-filter: var(--glass-blur-heavy);
+            -webkit-backdrop-filter: var(--glass-blur-heavy);
+        }
+        
+        /* Improved visual hierarchy */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+        
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.5;
+        }
+        
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.4;
+        }
+        
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 1.3;
+        }
+        
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 1.2;
+        }
+        
+        /* Refined spacing */
+        .container {
+            max-width: 1280px;
+        }
+        
+        /* Enhanced mobile responsiveness */
+        @media (max-width: 640px) {
+            .nav-button {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .nav-button span {
+                display: none;
+            }
+            
+            .glass-panel {
+                border-radius: 16px;
+                margin: 0.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Modern Navigation -->
-    <nav class="modern-nav">
-        <div class="nav-container">
-            <a href="#home" class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-water"></i>
+    <!-- Dynamic Background System -->
+    <div class="background-container">
+        <div class="background-layer active" id="bg-layer-1"></div>
+        <div class="background-layer" id="bg-layer-2"></div>
+        <div class="background-overlay"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-glass fixed w-full z-50 top-0">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center glass-interactive shadow-lg">
+                        <span class="text-white font-bold text-xl tracking-tight">RC</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold text-glass tracking-tight">RowCast</h1>
+                        <p class="text-xs text-glass-muted font-medium">Weather Intelligence</p>
+                    </div>
                 </div>
-                <span>SWD Platform</span>
-            </a>
-            
-            <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link" data-section="home">
-                        <i class="fas fa-home"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#weather" class="nav-link" data-section="weather">
-                        <i class="fas fa-cloud-sun"></i>
-                        <span>Weather</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#dashboard" class="nav-link" data-section="dashboard">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#api-docs" class="nav-link" data-section="api-docs">
-                        <i class="fas fa-code"></i>
-                        <span>API Docs</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="services.html" class="nav-link external-link">
-                        <i class="fas fa-cogs"></i>
-                        <span>Services</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="contact.html" class="nav-link external-link">
-                        <i class="fas fa-envelope"></i>
-                        <span>Contact</span>
-                    </a>
-                </li>
-            </ul>
-            
-            <button class="mobile-toggle" id="mobile-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
+                
+                <!-- Navigation Buttons -->
+                <div class="flex space-x-3">
+                    <button class="nav-button active px-5 py-3 rounded-xl flex items-center space-x-2 font-medium transition-all duration-300" data-page="home">
+                        <i class="fas fa-home text-sm"></i>
+                        <span class="hidden sm:inline text-sm tracking-wide">Home</span>
+                    </button>
+                    <button class="nav-button px-5 py-3 rounded-xl flex items-center space-x-2 font-medium transition-all duration-300" data-page="weather">
+                        <i class="fas fa-cloud-sun text-sm"></i>
+                        <span class="hidden sm:inline text-sm tracking-wide">Weather</span>
+                    </button>
+                    <button class="nav-button px-5 py-3 rounded-xl flex items-center space-x-2 font-medium transition-all duration-300" data-page="dashboard">
+                        <i class="fas fa-chart-line text-sm"></i>
+                        <span class="hidden sm:inline text-sm tracking-wide">Dashboard</span>
+                    </button>
+                    <button class="nav-button px-5 py-3 rounded-xl flex items-center space-x-2 font-medium transition-all duration-300" data-page="api">
+                        <i class="fas fa-code text-sm"></i>
+                        <span class="hidden sm:inline text-sm tracking-wide">API</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Home Section -->
-        <section class="content-section active" id="section-home">
-            <div class="section-container">
-                <div class="hero-section">
-                    <h1 class="hero-title">Weather & Water Data</h1>
-                    <p class="hero-subtitle">Real-time monitoring and forecasting for optimal rowing conditions on the Schuylkill River</p>
-                </div>
-                
-                <!-- Current Conditions Overview -->
-                <div class="glass-card">
-                    <h2 class="section-title">
-                        <div class="title-icon">
-                            <i class="fas fa-gauge-high"></i>
-                        </div>
-                        RowCast Score for Schuylkill River
-                    </h2>
-                    <div style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-                        Real-time conditions assessment for rowing at Boathouse Row, Philadelphia
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
-                        <div style="text-align: center;">
-                            <div id="rowcast-score" style="font-size: 4rem; font-weight: 800; color: var(--accent-blue);">--</div>
-                            <div style="color: var(--text-secondary); font-size: 1.1rem;">Current Score</div>
-                        </div>
-                        <div style="flex: 1;">
-                            <div id="score-bar" style="height: 12px; background: var(--tertiary-dark); border-radius: 6px; overflow: hidden;">
-                                <div id="score-fill" style="height: 100%; background: var(--gradient-primary); width: 0%; transition: width 0.5s ease;"></div>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
-                                <span>0-3 Poor</span>
-                                <span>4-6 Fair</span>
-                                <span>7-8 Good</span>
-                                <span>9-10 Excellent</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1rem;">
-                        <strong>Factors considered:</strong> Wind speed & gusts, water flow rate, water temperature, and visibility. 
-                        Score decreases with high winds (>10 mph), extreme water flows, and poor weather conditions.
-                    </div>
-                </div>
-                
-                <div class="river-data-section">
-                    <h2 class="section-title">
-                        <div class="title-icon">
-                            <i class="fas fa-tint"></i>
-                        </div>
-                        Current River Conditions
-                    </h2>
-                    
-                    <div class="river-data-grid">
-                        <div class="data-card">
-                            <div class="data-label">Water Flow</div>
-                            <div class="data-value" id="R-Discharge">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">ft³/s</div>
-                        </div>
-                        <div class="data-card">
-                            <div class="data-label">Water Temp</div>
-                            <div class="data-value" id="R-Temp">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">°F</div>
-                        </div>
-                        <div class="data-card">
-                            <div class="data-label">Water Height</div>
-                            <div class="data-value" id="R-Height">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">ft</div>
-                        </div>
-                        <div class="data-card">
-                            <div class="data-label">Wind Speed</div>
-                            <div class="data-value" id="R-WindSpeed">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">mph</div>
-                        </div>
-                        <div class="data-card">
-                            <div class="data-label">Wind Gusts</div>
-                            <div class="data-value" id="R-Gusts">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">mph</div>
-                        </div>
-                        <div class="data-card">
-                            <div class="data-label">Wind Direction</div>
-                            <div class="data-value" id="R-Direction">Loading...</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">degrees</div>
-                        </div>
-                    </div>
-                    
-                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                        <strong>Data Sources:</strong> Water data from USGS Station #01474500 (Schuylkill River at Philadelphia), 
-                        Weather data from Open-Meteo API. Data updates every 15 minutes.
-                    </div>
-                    
-                    <div class="wind-animation">
-                        <img id="wind" class="wind-gif" src="assets/gifs/WindGif5.gif" alt="Wind Animation">
-                    </div>
-                    
-                    <button id="fetchButton" class="action-button">
-                        <i class="fas fa-sync-alt"></i>
-                        Fetch Current Wind Data
-                    </button>
-                </div>
+    <!-- Main Content Container -->
+    <main id="main-content" class="min-h-screen pt-24">
+        <!-- Dynamic content will be loaded here -->
+    </main>
 
-                <!-- Wind Map Section -->
-                <div class="glass-card">
-                    <h2 class="section-title">
-                        <div class="title-icon">
-                            <i class="fas fa-wind"></i>
-                        </div>
-                        Live Wind Map - Schuylkill River
-                    </h2>
-                    <div class="wind-map-container" style="position: relative; height: 400px; border-radius: 12px; overflow: hidden;">
-                        <iframe 
-                            id="wind-map" 
-                            src="https://embed.windy.com/embed2.html?lat=39.970&lon=-75.183&detailLat=39.970&detailLon=-75.183&width=100%&height=400&zoom=12&level=surface&overlay=wind&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1"
-                            style="width: 100%; height: 100%; border: none;"
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                </div>
-
-                <!-- Additional Data Sources -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
-                    <!-- USGS River Conditions -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-water" style="color: var(--accent-blue);"></i>
-                            USGS River Data
-                        </h3>
-                        <div id="usgs-data" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-blue);"></i>
-                                <p style="margin-top: 1rem;">Loading USGS data...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tide Information -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-water" style="color: var(--accent-green);"></i>
-                            Delaware River Tides
-                        </h3>
-                        <div id="tide-data" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-green);"></i>
-                                <p style="margin-top: 1rem;">Loading tide data...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- UV Index & Air Quality -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-sun" style="color: var(--accent-orange);"></i>
-                            UV & Air Quality
-                        </h3>
-                        <div id="uv-air-data" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-orange);"></i>
-                                <p style="margin-top: 1rem;">Loading environmental data...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Weather Alerts -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-exclamation-triangle" style="color: var(--accent-orange);"></i>
-                            Weather Alerts
-                        </h3>
-                        <div id="weather-alerts" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-orange);"></i>
-                                <p style="margin-top: 1rem;">Checking for alerts...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Weather Section -->
-        <section class="content-section" id="section-weather">
-            <div class="section-container">
-                <div class="hero-section">
-                    <h1 class="hero-title">Weather Forecast</h1>
-                    <p class="hero-subtitle">Comprehensive weather data for Philadelphia and the Schuylkill River race course</p>
-                </div>
-                
-                <!-- Primary Weather Widget -->
-                <div class="glass-card weather-container">
-                    <a class="weatherwidget-io weather-widget" href="https://forecast7.com/en/39d95n75d17/philadelphia/?unit=us" 
-                       data-label_1="PHILADELPHIA" data-label_2="WEATHER" data-font="Inter" 
-                       data-icons="Climacons Animated" data-theme="dark" 
-                       data-highcolor="#00a8ff" data-lowcolor="#6c5ce7">
-                        PHILADELPHIA WEATHER
-                    </a>
-                </div>
-
-                <!-- Extended Weather Information Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 2rem;">
-                    <!-- Radar Map -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-satellite-dish" style="color: var(--accent-blue);"></i>
-                            Weather Radar
-                        </h3>
-                        <div style="position: relative; height: 300px; border-radius: 12px; overflow: hidden;">
-                            <iframe 
-                                src="https://embed.windy.com/embed2.html?lat=39.970&lon=-75.183&detailLat=39.970&detailLon=-75.183&width=100%&height=300&zoom=8&level=surface&overlay=radar&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1"
-                                style="width: 100%; height: 100%; border: none;"
-                                loading="lazy">
-                            </iframe>
-                        </div>
-                    </div>
-
-                    <!-- Temperature and Precipitation -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-temperature-high" style="color: var(--accent-orange);"></i>
-                            Temperature & Precipitation
-                        </h3>
-                        <div id="temp-precip-data" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-orange);"></i>
-                                <p style="margin-top: 1rem;">Loading temperature data...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Visibility and Conditions -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-eye" style="color: var(--accent-purple);"></i>
-                            Visibility & Conditions
-                        </h3>
-                        <div id="visibility-data" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-purple);"></i>
-                                <p style="margin-top: 1rem;">Loading visibility data...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Hourly Forecast -->
-                    <div class="glass-card" style="grid-column: 1 / -1;">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-clock" style="color: var(--accent-green);"></i>
-                            24-Hour Forecast
-                        </h3>
-                        <div id="hourly-forecast" style="color: var(--text-secondary);">
-                            <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-green);"></i>
-                                <p style="margin-top: 1rem;">Loading hourly forecast...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Marine Weather -->
-                <div class="glass-card" style="margin-top: 2rem;">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-ship" style="color: var(--accent-blue);"></i>
-                        Marine Weather - Delaware River
-                    </h3>
-                    <div id="marine-weather" style="color: var(--text-secondary);">
-                        <div class="loading-spinner" style="text-align: center; padding: 2rem;">
-                            <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-blue);"></i>
-                            <p style="margin-top: 1rem;">Loading marine weather...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dashboard Section -->
-        <section class="content-section dashboard-container" id="section-dashboard">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">
-                    <i class="fas fa-chart-line"></i>
-                    RowCast Analytics Dashboard
-                </h1>
-                <div style="display: flex; gap: 1rem; align-items: center;">
-                    <button class="action-button" onclick="refreshData()" style="margin: 0; min-width: auto; padding: 0.5rem 1rem;">
-                        <i class="fas fa-sync-alt"></i>
-                        Refresh Data
-                    </button>
-                    <button class="action-button" onclick="showSection('home')" style="margin: 0; min-width: auto; padding: 0.5rem 1rem;">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Home
-                    </button>
-                </div>
-            </div>
-            <div class="dashboard-content" id="dashboard-content">
-                <!-- Dashboard Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
-                    <!-- Current Score Widget -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-gauge-high" style="color: var(--accent-blue);"></i>
-                            RowCast Score for Boathouse Row
-                        </h3>
-                        <div style="text-align: center;">
-                            <div id="dashboard-score" style="font-size: 4rem; font-weight: 800; color: var(--accent-blue);">--</div>
-                            <div style="color: var(--text-secondary); margin-bottom: 1rem;">out of 10</div>
-                            <div id="dashboard-score-bar" style="height: 8px; background: var(--tertiary-dark); border-radius: 4px; overflow: hidden;">
-                                <div id="dashboard-score-fill" style="height: 100%; background: var(--gradient-primary); width: 0%; transition: width 0.5s ease;"></div>
-                            </div>
-                            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                                <div>0-3: Poor | 4-6: Fair | 7-8: Good | 9-10: Excellent</div>
-                                <div style="margin-top: 0.5rem;">Last updated: <span id="score-timestamp">--</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Forecast -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-crystal-ball" style="color: var(--accent-purple);"></i>
-                            Next 6 Hours Forecast
-                        </h3>
-                        <div id="quick-forecast" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
-                            <!-- Quick forecast items will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- Current Conditions Summary -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-water" style="color: var(--accent-green);"></i>
-                            Schuylkill River Conditions
-                        </h3>
-                        <div style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
-                            Data from USGS Station #01474500 - Schuylkill River at Philadelphia, PA
-                        </div>
-                        <div id="conditions-summary" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Water Flow Rate</div>
-                                <div id="current-flow" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">-- ft³/s</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Ideal: 1,000-3,000 ft³/s</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Water Temperature</div>
-                                <div id="current-water-temp" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">--°F</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Current river temp</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Wind Speed</div>
-                                <div id="current-wind" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">-- mph</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Ideal: Under 10 mph</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Air Temperature</div>
-                                <div id="current-temp" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">--°F</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Feels like temperature</div>
-                            </div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Water Temp</div>
-                                <div id="current-water-temp" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">--°F</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">Air Temp</div>
-                                <div id="current-air-temp" style="font-size: 1.2rem; font-weight: 600; color: var(--text-primary);">--°F</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Schuylkill River Wind Map -->
-                <div class="glass-card" style="margin-bottom: 2rem;">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-map-marked-alt" style="color: var(--accent-blue);"></i>
-                        Schuylkill River Course - Wind Direction & Speed
-                    </h3>
-                    <div style="position: relative; height: 500px; border-radius: 12px; overflow: hidden; background: var(--secondary-dark);">
-                        <div id="river-map-container" style="position: relative; width: 100%; height: 100%;">
-                            <!-- Base map -->
-                            <iframe 
-                                id="base-river-map" 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12094.666363516783!2d-75.19342!3d39.9696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c6c7b41e3b7ad9%3A0x6b8f0c7f8e3c7f8e!2sBoathouse%20Row%2C%20Philadelphia%2C%20PA!5e0!3m2!1sen!2sus!4v1641234567890!5m2!1sen!2sus"
-                                style="width: 100%; height: 100%; border: none; opacity: 0.7;"
-                                loading="lazy">
-                            </iframe>
-                            
-                            <!-- Wind direction overlay -->
-                            <div id="wind-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-                                <!-- Boathouse Row Station (Main) -->
-                                <div class="wind-station" data-lat="39.9696" data-lng="-75.1834" style="position: absolute; top: 75%; left: 35%; transform: translate(-50%, -50%);">
-                                    <div class="wind-arrow-container">
-                                        <div class="wind-arrow" id="main-wind-arrow" style="transform: rotate(0deg); transition: transform 0.3s ease;">
-                                            <svg width="40" height="40" viewBox="0 0 40 40" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));">
-                                                <path d="M20 5 L25 15 L20 12 L15 15 Z" fill="#00a8ff" stroke="#ffffff" stroke-width="1"/>
-                                                <line x1="20" y1="12" x2="20" y2="35" stroke="#00a8ff" stroke-width="3"/>
-                                            </svg>
-                                        </div>
-                                        <div class="wind-speed-label" id="main-wind-speed" style="position: absolute; top: -28px; left: 50%; transform: translateX(-50%); background: rgba(0, 168, 255, 0.95); color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap;">
-                                            -- mph
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Girard Avenue Bridge Station -->
-                                <div class="wind-station" data-lat="39.975" data-lng="-75.180" style="position: absolute; top: 50%; left: 55%;">
-                                    <div class="wind-arrow-container">
-                                        <div class="wind-arrow secondary-wind-arrow" style="transform: rotate(0deg); transition: transform 0.3s ease;">
-                                            <svg width="30" height="30" viewBox="0 0 30 30" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
-                                                <path d="M15 5 L18 12 L15 10 L12 12 Z" fill="#6c5ce7" stroke="#ffffff" stroke-width="1"/>
-                                                <line x1="15" y1="10" x2="15" y2="25" stroke="#6c5ce7" stroke-width="2"/>
-                                            </svg>
-                                        </div>
-                                        <div class="wind-speed-label secondary-wind-speed" style="position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: rgba(108, 92, 231, 0.95); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold;">
-                                            -- mph
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Falls Bridge Station -->
-                                <div class="wind-station" data-lat="39.965" data-lng="-75.185" style="position: absolute; top: 25%; left: 65%;">
-                                    <div class="wind-arrow-container">
-                                        <div class="wind-arrow secondary-wind-arrow" style="transform: rotate(0deg); transition: transform 0.3s ease;">
-                                            <svg width="28" height="28" viewBox="0 0 28 28" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
-                                                <path d="M14 4 L17 11 L14 9 L11 11 Z" fill="#00b894" stroke="#ffffff" stroke-width="1"/>
-                                                <line x1="14" y1="9" x2="14" y2="24" stroke="#00b894" stroke-width="2"/>
-                                            </svg>
-                                        </div>
-                                        <div class="wind-speed-label secondary-wind-speed" style="position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: rgba(0, 184, 148, 0.95); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold;">
-                                            -- mph
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Strawberry Mansion Bridge Station -->
-                                <div class="wind-station" data-lat="39.988" data-lng="-75.177" style="position: absolute; top: 15%; left: 75%;">
-                                    <div class="wind-arrow-container">
-                                        <div class="wind-arrow secondary-wind-arrow" style="transform: rotate(0deg); transition: transform 0.3s ease;">
-                                            <svg width="26" height="26" viewBox="0 0 26 26" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
-                                                <path d="M13 4 L16 10 L13 8 L10 10 Z" fill="#fd79a8" stroke="#ffffff" stroke-width="1"/>
-                                                <line x1="13" y1="8" x2="13" y2="22" stroke="#fd79a8" stroke-width="2"/>
-                                            </svg>
-                                        </div>
-                                        <div class="wind-speed-label secondary-wind-speed" style="position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: rgba(253, 121, 168, 0.95); color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold;">
-                                            -- mph
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Enhanced Map Legend -->
-                        <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.9); padding: 12px; border-radius: 8px; color: white; font-size: 11px; backdrop-filter: blur(10px);">
-                            <div style="margin-bottom: 8px; font-weight: bold; color: var(--accent-blue);">Wind Monitoring Stations</div>
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <div style="width: 12px; height: 12px; background: #00a8ff; border-radius: 2px;"></div>
-                                <span>Boathouse Row</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <div style="width: 12px; height: 12px; background: #6c5ce7; border-radius: 2px;"></div>
-                                <span>Girard Ave Bridge</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                                <div style="width: 12px; height: 12px; background: #00b894; border-radius: 2px;"></div>
-                                <span>Falls Bridge</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <div style="width: 12px; height: 12px; background: #fd79a8; border-radius: 2px;"></div>
-                                <span>Strawberry Mansion</span>
-                            </div>
-                            <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.2); font-size: 10px; color: #ccc;">
-                                Live wind speed & direction
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
-                    <!-- RowCast Score Forecast Chart -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-chart-line" style="color: var(--accent-purple);"></i>
-                            RowCast Score Forecast (48h)
-                        </h3>
-                        <div style="position: relative; height: 300px;">
-                            <canvas id="rowcast-forecast-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Wind Conditions Chart -->
-                    <div class="glass-card">
-                        <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="fas fa-wind" style="color: var(--accent-blue);"></i>
-                            Wind Forecast (24h)
-                        </h3>
-                        <div style="position: relative; height: 300px;">
-                            <canvas id="wind-forecast-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detailed Forecast Table -->
-                <div class="glass-card">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-table" style="color: var(--accent-orange);"></i>
-                        Detailed 48-Hour Forecast
-                    </h3>
-                    <div style="overflow-x: auto;">
-                        <table id="detailed-forecast-table" style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: var(--tertiary-dark);">
-                                    <th style="padding: 1rem; text-align: left; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Time</th>
-                                    <th style="padding: 1rem; text-align: center; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Score</th>
-                                    <th style="padding: 1rem; text-align: center; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Conditions</th>
-                                    <th style="padding: 1rem; text-align: center; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Wind</th>
-                                    <th style="padding: 1rem; text-align: center; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Water</th>
-                                    <th style="padding: 1rem; text-align: center; color: var(--text-primary); border-bottom: 1px solid var(--border-color);">Temperature</th>
-                                </tr>
-                            </thead>
-                            <tbody id="forecast-table-body">
-                                <!-- Forecast data will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Dashboard Navigation -->
-                <div class="glass-card" style="margin-top: 2rem;">
-                    <div style="display: flex; justify-content: center; gap: 1rem; padding: 1rem;">
-                        <button class="action-button" onclick="loadForecastData('6h')" style="margin: 0;">
-                            <i class="fas fa-clock"></i>
-                            6 Hour View
-                        </button>
-                        <button class="action-button" onclick="loadForecastData('24h')" style="margin: 0;">
-                            <i class="fas fa-calendar-day"></i>
-                            24 Hour View
-                        </button>
-                        <button class="action-button" onclick="loadForecastData('48h')" style="margin: 0;">
-                            <i class="fas fa-calendar-week"></i>
-                            48 Hour View
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- API Documentation Section -->
-        <section class="content-section api-container" id="section-api-docs">
-            <div class="api-header">
-                <button class="action-button" onclick="showSection('home')" style="position: absolute; top: 1rem; left: 1rem; margin: 0; min-width: auto; padding: 0.5rem 1rem;">
-                    <i class="fas fa-arrow-left"></i>
-                    Back
-                </button>
-                <h1 class="api-title">
-                    <i class="fas fa-water"></i>
-                    RowCast API Documentation
-                </h1>
-                <p style="color: var(--text-secondary); font-size: 1.2rem;">Real-time rowing conditions and forecast data API</p>
-                <div class="glass-card" style="display: inline-block; margin-top: 1rem;">
-                    <code style="color: var(--accent-blue); font-family: 'JetBrains Mono', monospace;">
-                        Base URL: <span id="base-url">https://api.samwduncan.com</span>
-                    </code>
-                </div>
-            </div>
-            <div style="padding: 2rem;">
-                <div id="api-docs-content">
-                    <div class="glass-card">
-                        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">
-                            <i class="fas fa-book"></i>
-                            API Documentation Loading
-                        </h3>
-                        <p style="color: var(--text-secondary);">Comprehensive API documentation and interactive examples will be loaded here...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="loading-spinner">
-                <div class="spinner"></div>
-                <p>Loading data...</p>
-            </div>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 glass-panel z-50 hidden flex items-center justify-center">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-glass-muted">Loading...</p>
         </div>
     </div>
 
-    <!-- Background Controls -->
-    <div class="bg-controls">
-        <div class="bg-control active" data-id="0"></div>
-        <div class="bg-control" data-id="1"></div>
-        <div class="bg-control" data-id="2"></div>
-    </div>
-
-    <!-- Diagonal background design (maintained from original) -->
-    <div class="tm-bg">
-        <div class="tm-bg-left"></div>
-        <div class="tm-bg-right"></div>
-    </div>
-    
-    <!-- Load jQuery first -->
-    <script src="js/jquery-3.4.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.backstretch.min.js"></script>
-    <script src="js/templatemo-script.js"></script>
-    <!-- Load Chart.js for dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Load data configuration first -->
-    <script src="js/data-config.js"></script>
-    <!-- Load unified RowCast application script -->
-    <script src="js/main.js"></script>
-    
-    <!-- Modern SPA Router Script -->
-    <script>
-        // Modern SPA Navigation System
-        function showSection(sectionName) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Update navigation active state
-            const navLinks = document.querySelectorAll('.nav-link[data-section]');
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('data-section') === sectionName) {
-                    link.classList.add('active');
-                }
-            });
-            
-            // Show the selected section
-            const targetSection = document.getElementById(`section-${sectionName}`);
-            if (targetSection) {
-                setTimeout(() => {
-                    targetSection.classList.add('active');
-                }, 50);
-                
-                // Special handling for different sections
-                switch(sectionName) {
-                    case 'dashboard':
-                        if (window.spaLoader) {
-                            window.spaLoader.loadDashboardContent();
-                        }
-                        break;
-                    case 'api-docs':
-                        const baseUrlElement = document.getElementById('base-url');
-                        if (baseUrlElement) {
-                            baseUrlElement.textContent = window.location.origin;
-                        }
-                        if (window.spaLoader) {
-                            window.spaLoader.loadAPIDocsContent();
-                        }
-                        break;
-                    case 'weather':
-                        // Reload weather widget if needed
-                        if (typeof window.weatherwidget_io_js !== 'undefined') {
-                            window.weatherwidget_io_js();
-                        }
-                        break;
-                }
-            }
-            
-            // Update URL hash
-            window.location.hash = sectionName;
-        }
-        
-        // Handle navigation clicks
-        document.addEventListener('click', function(e) {
-            const link = e.target.closest('.nav-link[data-section]');
-            if (link && link.getAttribute('data-section')) {
-                e.preventDefault();
-                const section = link.getAttribute('data-section');
-                showSection(section);
-            }
-        });
-        
-        // Handle hash changes
-        window.addEventListener('hashchange', function() {
-            const hash = window.location.hash.replace('#', '');
-            if (hash && document.getElementById(`section-${hash}`)) {
-                showSection(hash);
-            }
-        });
-        
-        // Mobile navigation toggle
-        document.getElementById('mobile-toggle').addEventListener('click', function() {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.classList.toggle('active');
-        });
-        
-        // Background controls
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('bg-control')) {
-                const controls = document.querySelectorAll('.bg-control');
-                controls.forEach(control => control.classList.remove('active'));
-                e.target.classList.add('active');
-                
-                // Trigger background change (using existing templatemo script)
-                const bgId = e.target.getAttribute('data-id');
-                if (window.changeBackstretchImage) {
-                    window.changeBackstretchImage(bgId);
-                }
-            }
-        });
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const hash = window.location.hash.replace('#', '');
-            const initialSection = hash && document.getElementById(`section-${hash}`) ? hash : 'home';
-            showSection(initialSection);
-        });
-        
-        // Dashboard functions - delegate to main RowCastApp
-        function refreshData() {
-            if (window.rowcastApp && typeof window.rowcastApp.refreshData === 'function') {
-                window.rowcastApp.refreshData();
-            } else {
-                console.log('RowCast app not ready yet');
-            }
-        }
-        
-        // API docs functions
-        async function tryEndpoint(endpoint) {
-            const modal = document.getElementById('response-modal');
-            const content = document.getElementById('response-content');
-            
-            if (!modal || !content) return;
-            
-            try {
-                modal.style.display = 'flex';
-                content.textContent = 'Loading...';
-                
-                const response = await fetch(window.location.origin + endpoint);
-                const data = await response.json();
-                content.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                content.textContent = 'Error: ' + error.message;
-            }
-        }
-        
-        function closeModal() {
-            const modal = document.getElementById('response-modal');
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-    </script>
-    
-    <!-- Data fetching is now handled by main.js RowCastApp class -->
-    
-    <!-- Weather Widget Script -->
-    <script>
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElement(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-    </script>
-    
-    <!-- Wind Map Script -->
-    <script>
-        // Initialize Windy map
-        function initWindyMap() {
-            const mapContainer = document.getElementById('wind-map');
-            if (mapContainer) {
-                const lat = 39.970;
-                const lon = -75.183;
-                const zoom = 12;
-                const apiKey = 'YOUR_WINDY_API_KEY'; // Replace with your Windy API key
-                
-                // Load Windy API script
-                const script = document.createElement('script');
-                script.src = `https://api.windy.com/assets/map-embed.js?lat=${lat}&lon=${lon}&zoom=${zoom}&key=${apiKey}`;
-                script.async = true;
-                script.onload = () => {
-                    // Initialize the map
-                    window.Windy.init(mapContainer, {
-                        lat,
-                        lon,
-                        zoom,
-                        key: apiKey,
-                        overlay: 'wind',
-                        product: 'ecmwf',
-                        detail: true,
-                        marker: true,
-                        calendar: 'now',
-                        pressure: false,
-                        type: 'map',
-                        location: 'coordinates',
-                        metricWind: 'mph',
-                        metricTemp: '°F',
-                        radarRange: -1
-                    });
-                };
-                document.head.appendChild(script);
-            }
-        }
-        
-        // Call initWindyMap on page load
-        document.addEventListener('DOMContentLoaded', initWindyMap);
-    </script>
+    <!-- Scripts -->
+    <script type="module" src="js/background.js"></script>
+    <script type="module" src="js/navigation.js"></script>
+    <script type="module" src="js/home.js"></script>
+    <script type="module" src="js/weather.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>

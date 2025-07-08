@@ -109,8 +109,8 @@ def rowcast():
         return jsonify({"error": "Current weather or water data not available yet. Please try again shortly."}), 404
     
     params = merge_params(current_weather, current_water)
-    score = compute_rowcast(params)
-    return jsonify({ "rowcastScore": score, "params": params })
+    result = compute_rowcast(params)
+    return jsonify({ "rowcastScore": result['score'], "factors": result['factors'], "params": params })
 
 @bp.route("/api/rowcast/forecast")
 def rowcast_forecast():
@@ -187,18 +187,18 @@ def complete_data():
     forecast_scores = get_data_from_redis('forecast_scores')
     
     # Calculate current rowcast score
-    current_score = None
+    current_rowcast = None
     if weather_data and water_data:
         current_weather = weather_data.get('current', {})
         current_water = water_data.get('current', {})
         params = merge_params(current_weather, current_water)
-        current_score = compute_rowcast(params)
+        current_rowcast = compute_rowcast(params)
     
     response = {
         "current": {
             "weather": weather_data.get('current') if weather_data else None,
             "water": water_data.get('current') if water_data else None,
-            "rowcastScore": current_score
+            "rowcast": current_rowcast
         },
         "forecast": {
             "weather": weather_data.get('forecast') if weather_data else None,
@@ -346,8 +346,10 @@ def complete_extended():
                 'precipitationProbability': 0  # Not available in current weather
             }
             
+            current_rowcast = compute_rowcast(current_params)
             response['rowcast']['current'] = {
-                'score': compute_rowcast(current_params),
+                'score': current_rowcast['score'],
+                'factors': current_rowcast['factors'],
                 'conditions': current_params,
                 'timestamp': weather_data['current'].get('timestamp'),
                 'noaaDataUsed': noaa_current.get('discharge') is not None or noaa_current.get('gaugeHeight') is not None
@@ -480,3 +482,54 @@ def serve_static(filename):
     else:
         # In development, let the dev server handle it
         return redirect(f'http://localhost:8000/{filename}')
+
+@bp.route("/api/rowcast/test", methods=["GET"])
+def rowcast_test():
+    """Test endpoint: compute RowCast score for arbitrary parameters via query string (for automated testing/debugging)."""
+    import json
+    # Parse query parameters
+    def parse_float(key, default=None):
+        val = request.args.get(key, default)
+        try:
+            return float(val) if val is not None else None
+        except Exception:
+            return default
+    def parse_int(key, default=None):
+        val = request.args.get(key, default)
+        try:
+            return int(val) if val is not None else None
+        except Exception:
+            return default
+    def parse_json(key, default=None):
+        val = request.args.get(key)
+        if val:
+            try:
+                return json.loads(val)
+            except Exception:
+                return default
+        return default
+
+    params = {
+        'apparentTemp': parse_float('apparentTemp'),
+        'windSpeed': parse_float('windSpeed', 0),
+        'windGust': parse_float('windGust', 0),
+        'discharge': parse_float('discharge', 0),
+        'waterTemp': parse_float('waterTemp'),
+        'precipitation': parse_float('precipitation', 0),
+        'uvIndex': parse_float('uvIndex', 0),
+        'weatherAlerts': parse_json('weatherAlerts', []),
+        'visibility': parse_float('visibility'),
+        'lightningPotential': parse_float('lightningPotential'),
+        'precipitationProbability': parse_float('precipitationProbability'),
+        'forecastScores': parse_json('forecastScores', None)
+    }
+    
+    result = compute_rowcast(params)
+    min_factor = min(result['factors'], key=result['factors'].get) if result['factors'] else None
+    
+    return jsonify({
+        'score': result['score'],
+        'factors': result['factors'],
+        'biggestLimitingFactor': min_factor,
+        'params': params
+    })

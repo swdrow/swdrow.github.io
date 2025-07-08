@@ -1,18 +1,17 @@
 {
   "name": "swdrow-website",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Sam Duncan's professional website with integrated RowCast API",
   "scripts": {
-    "dev": "cd api && npm run dev",
-    "dev:frontend": "cd api && npm run dev",
-    "dev:api": "cd api && ./start_server.sh",
-    "dev:both": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
-    "build": "cd api && npm run build",
-    "preview": "cd api && npm run preview",
-    "test:api": "cd api && python test_api.py",
-    "deploy:build": "npm run build && echo 'Upload dist/ folder to Cloudflare Pages'",
-    "install:api": "cd api && pip install -r requirements.txt",
-    "start": "node server.js"
+    "dev": "vite --port 3000 --open",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "api:dev": "cd api && ./scripts/start-dev.sh",
+    "api:prod": "cd api && ./scripts/start-prod.sh",
+    "api:stop": "cd api && ./scripts/stop-server.sh",
+    "api:status": "cd api && ./scripts/server-status.sh",
+    "full:dev": "concurrently \"npm run api:dev\" \"npm run dev\"",
+    "deploy": "npm run build && echo 'Deploy dist/ to Cloudflare Pages'"
   },
   "repository": {
     "type": "git",
@@ -23,22 +22,15 @@
     "website",
     "rowing",
     "api",
-    "weather",
-    "conditions"
+    "weather"
   ],
   "author": "Sam Duncan",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/swdrow/swdrow.github.io/issues"
-  },
-  "homepage": "https://github.com/swdrow/swdrow.github.io#readme",
-  "main": "server.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "express": "^5.1.0",
-    "http-proxy-middleware": "^3.0.5",
-    "vite": "^7.0.1"
+  "homepage": "https://samwduncan.com",
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "puppeteer": "^24.11.2",
+    "terser": "^5.43.1",
+    "vite": "^5.0.0"
   }
 }

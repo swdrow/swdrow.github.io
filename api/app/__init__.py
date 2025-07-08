@@ -94,6 +94,16 @@ def create_app():
     with app.app_context():
         from app.tasks import update_weather_data_job, update_water_data_job, update_forecast_scores_job, update_short_term_forecast_job, update_noaa_stageflow_job, update_extended_weather_data_job, update_extended_forecast_scores_job
 
+        # Run data population jobs immediately on startup to refresh Redis cache
+        update_weather_data_job()
+        update_water_data_job()
+        update_forecast_scores_job()
+        # Optionally, run other update jobs as needed
+        # update_short_term_forecast_job()
+        # update_noaa_stageflow_job()
+        # update_extended_weather_data_job()
+        # update_extended_forecast_scores_job()
+
         if not scheduler.running:
             scheduler.init_app(app) # Initialize scheduler with the app
             scheduler.start()

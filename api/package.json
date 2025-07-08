@@ -1,18 +1,14 @@
 {
-  "name": "rowcast-frontend",
-  "version": "1.0.0",
+  "name": "rowcast-api",
+  "version": "2.0.0",
   "private": true,
+  "description": "RowCast API Backend - Flask application with Redis caching",
   "scripts": {
-    "dev": "vite --port 3000 --open",
-    "build": "vite build",
-    "preview": "vite preview",
-    "api": "bash start_server.sh",
-    "dev:full": "concurrently \"npm run api\" \"npm run dev\"",
-    "build:prod": "npm run build && npm run api",
-    "stop": "bash stop_server.sh"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0",
-    "concurrently": "^8.2.0"
+    "start": "./scripts/start-prod.sh",
+    "dev": "./scripts/start-dev.sh",
+    "stop": "./scripts/stop-server.sh",
+    "status": "./scripts/server-status.sh",
+    "test": "./scripts/start-test.sh",
+    "logs": "tail -f logs/error.log"
   }
 }

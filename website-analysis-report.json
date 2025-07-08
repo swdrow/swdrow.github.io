@@ -1,0 +1,306 @@
+{
+  "timestamp": "2025-07-07T23:37:49.344Z",
+  "summary": {
+    "total": 59,
+    "errors": 17,
+    "warnings": 0,
+    "successes": 6
+  },
+  "results": [
+    {
+      "timestamp": "2025-07-07T23:37:44.712Z",
+      "type": "info",
+      "message": "Checking if development server is running..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:44.730Z",
+      "type": "info",
+      "message": "Checking Node.js dependencies..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:44.730Z",
+      "type": "success",
+      "message": "✅ Node modules found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:44.731Z",
+      "type": "success",
+      "message": "✅ Build files found in dist folder"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:44.731Z",
+      "type": "info",
+      "message": "Starting Vite preview server..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:44.996Z",
+      "type": "success",
+      "message": "✅ Vite preview server started successfully"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.016Z",
+      "type": "info",
+      "message": "🚀 Starting website analysis..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.016Z",
+      "type": "info",
+      "message": "Testing API connectivity..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.025Z",
+      "type": "success",
+      "message": "✅ API responding: current, forecast, lastUpdated"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.025Z",
+      "type": "success",
+      "message": "✅ Current data available: score=0.4, temp=80.2°F"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.025Z",
+      "type": "info",
+      "message": "Loading website page..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.250Z",
+      "type": "browser",
+      "message": "BROWSER CONSOLE [warn]: cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.313Z",
+      "type": "browser",
+      "message": "BROWSER CONSOLE [log]: Initializing RowCast Application..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.313Z",
+      "type": "browser",
+      "message": "BROWSER CONSOLE [log]: RowCast Application initialized successfully"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.411Z",
+      "type": "browser",
+      "message": "BROWSER CONSOLE [error]: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.418Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.425Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.426Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:47.435Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.028Z",
+      "type": "success",
+      "message": "✅ Page loaded successfully"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.167Z",
+      "type": "info",
+      "message": "📸 Screenshot saved as analysis-screenshot.png"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.167Z",
+      "type": "info",
+      "message": "Checking element structure..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.174Z",
+      "type": "error",
+      "message": "❌ Element #currentScore not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.174Z",
+      "type": "error",
+      "message": "❌ Element #currentTemp not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.175Z",
+      "type": "error",
+      "message": "❌ Element #currentWind not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.175Z",
+      "type": "error",
+      "message": "❌ Element #currentFlow not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.175Z",
+      "type": "error",
+      "message": "❌ Element #weatherTemp not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.176Z",
+      "type": "error",
+      "message": "❌ Element #feelsLike not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.176Z",
+      "type": "error",
+      "message": "❌ Element #dashboardScore not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.176Z",
+      "type": "info",
+      "message": "Checking JavaScript execution..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.177Z",
+      "type": "error",
+      "message": "❌ RowCast app object not found"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.177Z",
+      "type": "info",
+      "message": "Checking data population..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.177Z",
+      "type": "error",
+      "message": "❌ Element #currentScore not found or empty"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.177Z",
+      "type": "error",
+      "message": "❌ Element #currentTemp not found or empty"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.178Z",
+      "type": "error",
+      "message": "❌ Element #currentWind not found or empty"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.178Z",
+      "type": "error",
+      "message": "❌ Element #currentFlow not found or empty"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.178Z",
+      "type": "info",
+      "message": "Testing navigation..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.186Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.190Z",
+      "type": "error",
+      "message": "❌ Navigation to home page failed"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.201Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.201Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.204Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.207Z",
+      "type": "error",
+      "message": "❌ Navigation to weather page failed"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.237Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.240Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.248Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/rowcast/forecast"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.248Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/rowcast/forecast"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.281Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/weather/current"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.281Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/rowcast/forecast"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.292Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/weather/current"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.301Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/rowcast/forecast"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.301Z",
+      "type": "error",
+      "message": "❌ Navigation to dashboard page failed"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.334Z",
+      "type": "network",
+      "message": "API REQUEST: GET http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.338Z",
+      "type": "network",
+      "message": "API RESPONSE: 200 http://localhost:5000/api/complete"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.342Z",
+      "type": "error",
+      "message": "❌ Navigation to api page failed"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.342Z",
+      "type": "info",
+      "message": "Attempting to force data update..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.342Z",
+      "type": "info",
+      "message": "Clicking debug button..."
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.344Z",
+      "type": "error",
+      "message": "❌ Force data update failed: No element found for selector: #debugButton"
+    },
+    {
+      "timestamp": "2025-07-07T23:37:49.344Z",
+      "type": "info",
+      "message": "📋 Generating analysis report..."
+    }
+  ]
+}

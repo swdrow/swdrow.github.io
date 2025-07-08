@@ -19,9 +19,9 @@ def fetch_weather_data():
     lat, lon = 39.8682, -75.5916
     url = (
         f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}"
-        "&current=temperature_2m,apparent_temperature,wind_speed_10m,"  
+        "&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,"  
         "wind_direction_10m,wind_gusts_10m,precipitation,uv_index,visibility"
-        "&hourly=temperature_2m,apparent_temperature,wind_speed_10m,"
+        "&hourly=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,"
         "wind_direction_10m,wind_gusts_10m,precipitation,uv_index,visibility,precipitation_probability,lightning_potential"
         "&windspeed_unit=mph&temperature_unit=fahrenheit"
         "&timezone=America/New_York&forecast_days=2"
@@ -55,6 +55,7 @@ def fetch_weather_data():
             'precipitation': current.get('precipitation'),
             'currentTemp': current.get('temperature_2m'),
             'visibility': current.get('visibility'),
+            'humidity': current.get('relative_humidity_2m'),
             'timestamp': current.get('time'),
             'weatherAlerts': alerts  # Add active alerts
         }
@@ -79,6 +80,7 @@ def fetch_weather_data():
                 'precipitation': hourly.get('precipitation', [])[i] if i < len(hourly.get('precipitation', [])) else None,
                 'currentTemp': hourly.get('temperature_2m', [])[i] if i < len(hourly.get('temperature_2m', [])) else None,
                 'visibility': hourly.get('visibility', [])[i] if i < len(hourly.get('visibility', [])) else None,
+                'humidity': hourly.get('relative_humidity_2m', [])[i] if i < len(hourly.get('relative_humidity_2m', [])) else None,
                 'precipitationProbability': hourly.get('precipitation_probability', [])[i] if i < len(hourly.get('precipitation_probability', [])) else None,
                 'lightningPotential': hourly.get('lightning_potential', [])[i] if i < len(hourly.get('lightning_potential', [])) else None,
                 'weatherAlerts': alerts  # Include alerts for each forecast hour
@@ -593,6 +595,7 @@ def fetch_extended_weather_forecast():
             'precipitation': current.get('precipitation'),
             'currentTemp': current.get('temperature_2m'),
             'visibility': current.get('visibility'),
+            'humidity': current.get('relative_humidity_2m'),
             'timestamp': current.get('time'),
             'weatherAlerts': alerts
         }
@@ -617,6 +620,7 @@ def fetch_extended_weather_forecast():
                 'precipitation': hourly.get('precipitation', [])[i] if i < len(hourly.get('precipitation', [])) else None,
                 'currentTemp': hourly.get('temperature_2m', [])[i] if i < len(hourly.get('temperature_2m', [])) else None,
                 'visibility': hourly.get('visibility', [])[i] if i < len(hourly.get('visibility', [])) else None,
+                'humidity': hourly.get('relative_humidity_2m', [])[i] if i < len(hourly.get('relative_humidity_2m', [])) else None,
                 'precipitationProbability': hourly.get('precipitation_probability', [])[i] if i < len(hourly.get('precipitation_probability', [])) else None,
                 'lightningPotential': hourly.get('lightning_potential', [])[i] if i < len(hourly.get('lightning_potential', [])) else None,
                 'weatherAlerts': alerts
