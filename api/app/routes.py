@@ -554,3 +554,10 @@ def rowcast_test():
         'biggestLimitingFactor': min_factor,
         'params': params
     })
+
+@bp.route("/dashboard.html")
+def dashboard():
+    """Serve the dashboard with cache busting"""
+    import time
+    cache_buster = str(int(time.time()))
+    return render_template('dashboard.html', cache_buster=cache_buster)

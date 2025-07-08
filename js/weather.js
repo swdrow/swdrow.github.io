@@ -374,12 +374,12 @@ class WeatherManager {
                                                           hourValue < 12 ? `${hourValue} AM` : 
                                                           `${hourValue - 12} PM`;
                                         return `
-                                            <div class="hour-item glass-subtle rounded-lg p-3 cursor-pointer hover:bg-white/5 transition-all relative" 
+                                            <div class="hour-item glass-subtle rounded-lg p-3 cursor-pointer hover:bg-white/5 transition-all relative text-center flex flex-col items-center justify-center min-h-28" 
                                                  onclick="window.weatherManager.toggleHourTooltip(${index}, ${hourIndex}, event)"
                                                  data-hour-index="${hourIndex}">
-                                                <div class="text-xs text-glass-muted mb-1">${hourDisplay}</div>
-                                                <div class="text-sm font-medium mb-1">${Math.round(hour.currentTemp || 0)}°F</div>
-                                                <div class="text-xs space-y-1">
+                                                <div class="text-xs text-glass-muted mb-1 text-center w-full">${hourDisplay}</div>
+                                                <div class="text-sm font-medium mb-1 text-center w-full">${Math.round(hour.currentTemp || 0)}°F</div>
+                                                <div class="text-xs space-y-1 text-center w-full">
                                                     <div class="text-blue-400">${Math.round(hour.windSpeed || 0)} mph</div>
                                                     <div class="text-purple-400">${Math.round(hour.windGust || 0)} gust</div>
                                                     <div class="text-teal-400">${Math.round(hour.humidity || this.calculateHumidity(hour.currentTemp, hour.apparentTemp))}%</div>
@@ -396,9 +396,9 @@ class WeatherManager {
             </div>
             
             <!-- Hour Tooltip -->
-            <div id="hour-tooltip" class="fixed z-50 hidden glass-elevated rounded-xl p-4 shadow-2xl max-w-sm">
+            <div id="hour-tooltip" class="fixed z-50 hidden rounded-xl p-4 shadow-2xl max-w-sm" style="background: #1a1a1a; border: 1px solid #555555; color: #ffffff; line-height: 1.4;">
                 <div id="tooltip-content"></div>
-                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 glass-elevated rotate-45"></div>
+                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rotate-45" style="background: #1a1a1a; border: 1px solid #555555;"></div>
             </div>
         `;
         
@@ -549,21 +549,56 @@ class WeatherManager {
         if (!hourItemElement) return;
         
         const rect = hourItemElement.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
         
         // Show tooltip first to get its dimensions
         tooltip.classList.remove('hidden');
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = rect.left + rect.width / 2 - tooltipRect.width / 2; // Center horizontally
-        let top = rect.top - tooltipRect.height - 10; // Above the element
+        // For smaller screens, prioritize positioning above/below the element
+        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let top = rect.top - tooltipRect.height - 15;
         
-        // Adjust if tooltip would go off screen
-        if (left < 10) left = 10;
-        if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
-        if (top < 10) top = rect.bottom + 10; // Show below if no room above
+        // Enhanced responsive positioning
+        if (viewportWidth < 768) {
+            // Center tooltip horizontally over the target element
+            left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            
+            // Try to position above the element first
+            if (rect.top - tooltipRect.height - 15 > 0) {
+                top = rect.top - tooltipRect.height - 15;
+            } else {
+                // Position below if not enough space above
+                top = rect.bottom + 15;
+            }
+        }
         
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
+        // Ensure tooltip stays within viewport bounds
+        const margin = 10;
+        
+        // Horizontal bounds checking
+        if (left + tooltipRect.width > viewportWidth - margin) {
+            left = viewportWidth - tooltipRect.width - margin;
+        }
+        if (left < margin) {
+            left = margin;
+        }
+        
+        // Vertical bounds checking
+        if (top + tooltipRect.height > viewportHeight - margin) {
+            top = viewportHeight - tooltipRect.height - margin;
+        }
+        if (top < margin) {
+            top = margin;
+        }
+        
+        // Use scroll-aware positioning
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        tooltip.style.left = `${left + scrollLeft}px`;
+        tooltip.style.top = `${top + scrollTop}px`;
         tooltip.dataset.activeHour = `${dayIndex}-${hourIndex}`;
     }
 

@@ -394,10 +394,10 @@ class DashboardManager {
                     const conditions = item.conditions || {};
                     
                     return `
-                        <div class="widget-glass rounded-xl p-4 text-center">
-                            <div class="text-sm text-glass-muted mb-2">${displayTime}</div>
-                            <div class="text-2xl font-bold mb-3 rowcast-score-glow ${this.getScoreColor(score)}">${score.toFixed(1)}</div>
-                            <div class="text-xs space-y-1">
+                        <div class="widget-glass rounded-xl p-4 text-center flex flex-col items-center justify-center min-h-40">
+                            <div class="text-sm text-glass-muted mb-2 text-center w-full">${displayTime}</div>
+                            <div class="text-2xl font-bold mb-3 rowcast-score-glow ${this.getScoreColor(score)} text-center w-full">${score.toFixed(1)}</div>
+                            <div class="text-xs space-y-1 text-center w-full">
                                 <div class="text-red-400">${Math.round(conditions.apparentTemp || 0)}°F</div>
                                 <div class="text-blue-400">${Math.round(conditions.windSpeed || 0)} mph</div>
                                 <div class="text-purple-400">${Math.round(conditions.windGust || 0)} gust</div>
@@ -452,12 +452,12 @@ class DashboardManager {
                                                           hourValue < 12 ? `${hourValue} AM` : 
                                                           `${hourValue - 12} PM`;
                                         return `
-                                            <div class="hour-item glass-subtle rounded-lg p-3 cursor-pointer hover:bg-white/5 transition-all relative" 
+                                            <div class="hour-item glass-subtle rounded-lg p-3 cursor-pointer hover:bg-white/5 transition-all relative text-center flex flex-col items-center justify-center min-h-24" 
                                                  onclick="window.dashboardManager.toggleRowcastTooltip(${index}, ${hourIndex}, event)"
                                                  data-hour-index="${hourIndex}">
-                                                <div class="text-xs text-glass-muted mb-1">${hourDisplay}</div>
-                                                <div class="text-lg font-bold mb-2 rowcast-score-glow ${this.getScoreColor((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0)}">${((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0).toFixed(1)}</div>
-                                                <div class="text-xs space-y-1">
+                                                <div class="text-xs text-glass-muted mb-1 text-center w-full">${hourDisplay}</div>
+                                                <div class="text-lg font-bold mb-2 rowcast-score-glow ${this.getScoreColor((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0)} text-center w-full">${((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0).toFixed(1)}</div>
+                                                <div class="text-xs space-y-1 text-center w-full">
                                                     <div class="text-red-400">${Math.round(hour.conditions.apparentTemp || 0)}°F</div>
                                                     <div class="text-blue-400">${Math.round(hour.conditions.windSpeed || 0)} mph</div>
                                                     <div class="text-purple-400">${Math.round(hour.conditions.windGust || 0)} gust</div>
@@ -474,9 +474,9 @@ class DashboardManager {
             </div>
             
             <!-- RowCast Tooltip -->
-            <div id="rowcast-tooltip" class="fixed z-50 hidden glass-elevated rounded-xl p-4 shadow-2xl max-w-sm">
+            <div id="rowcast-tooltip" class="fixed z-50 hidden rounded-xl p-4 shadow-2xl max-w-sm" style="background: #1a1a1a; border: 1px solid #555555; color: #ffffff; line-height: 1.4;">
                 <div id="rowcast-tooltip-content"></div>
-                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 glass-elevated rotate-45"></div>
+                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rotate-45" style="background: #1a1a1a; border: 1px solid #555555;"></div>
             </div>
         `;
         
@@ -633,21 +633,56 @@ class DashboardManager {
         if (!hourItemElement) return;
         
         const rect = hourItemElement.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
         
         // Show tooltip first to get its dimensions
         tooltip.classList.remove('hidden');
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = rect.left + rect.width / 2 - tooltipRect.width / 2; // Center horizontally
-        let top = rect.top - tooltipRect.height - 10; // Above the element
+        // For smaller screens, prioritize positioning above/below the element
+        let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+        let top = rect.top - tooltipRect.height - 15;
         
-        // Adjust if tooltip would go off screen
-        if (left < 10) left = 10;
-        if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
-        if (top < 10) top = rect.bottom + 10; // Show below if no room above
+        // Enhanced responsive positioning
+        if (viewportWidth < 768) {
+            // Center tooltip horizontally over the target element
+            left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            
+            // Try to position above the element first
+            if (rect.top - tooltipRect.height - 15 > 0) {
+                top = rect.top - tooltipRect.height - 15;
+            } else {
+                // Position below if not enough space above
+                top = rect.bottom + 15;
+            }
+        }
         
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
+        // Ensure tooltip stays within viewport bounds
+        const margin = 10;
+        
+        // Horizontal bounds checking
+        if (left + tooltipRect.width > viewportWidth - margin) {
+            left = viewportWidth - tooltipRect.width - margin;
+        }
+        if (left < margin) {
+            left = margin;
+        }
+        
+        // Vertical bounds checking
+        if (top + tooltipRect.height > viewportHeight - margin) {
+            top = viewportHeight - tooltipRect.height - margin;
+        }
+        if (top < margin) {
+            top = margin;
+        }
+        
+        // Use scroll-aware positioning
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        tooltip.style.left = `${left + scrollLeft}px`;
+        tooltip.style.top = `${top + scrollTop}px`;
         tooltip.dataset.activeHour = `${dayIndex}-${hourIndex}`;
     }
 

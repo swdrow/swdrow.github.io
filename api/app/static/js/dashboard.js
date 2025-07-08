@@ -1101,21 +1101,54 @@ class RowCastDashboard {
         const tooltipRect = tooltip.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-
-        let left = event.pageX + 10;
-        let top = event.pageY - 10;
-
-        // Adjust position if tooltip would go off screen
-        if (left + tooltipRect.width > viewportWidth) {
-            left = event.pageX - tooltipRect.width - 10;
+        
+        // Get the target element's bounding box for better positioning
+        const target = event.target.closest('[data-tooltip]');
+        const targetRect = target ? target.getBoundingClientRect() : null;
+        
+        // Default positioning with improved spacing
+        let left = event.clientX + 15;
+        let top = event.clientY - 15;
+        
+        // For smaller screens, prioritize positioning above/below the element
+        if (viewportWidth < 768 && targetRect) {
+            // Center tooltip horizontally over the target element
+            left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+            
+            // Try to position above the element first
+            if (targetRect.top - tooltipRect.height - 10 > 0) {
+                top = targetRect.top - tooltipRect.height - 10;
+            } else {
+                // Position below if not enough space above
+                top = targetRect.bottom + 10;
+            }
         }
-
-        if (top - tooltipRect.height < 0) {
-            top = event.pageY + 20;
+        
+        // Ensure tooltip stays within viewport bounds
+        const margin = 10;
+        
+        // Horizontal bounds checking
+        if (left + tooltipRect.width > viewportWidth - margin) {
+            left = viewportWidth - tooltipRect.width - margin;
         }
-
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
+        if (left < margin) {
+            left = margin;
+        }
+        
+        // Vertical bounds checking
+        if (top + tooltipRect.height > viewportHeight - margin) {
+            top = viewportHeight - tooltipRect.height - margin;
+        }
+        if (top < margin) {
+            top = margin;
+        }
+        
+        // Use pageX/pageY for absolute positioning to account for scroll
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        tooltip.style.left = `${left + scrollLeft}px`;
+        tooltip.style.top = `${top + scrollTop}px`;
     }
 }
 

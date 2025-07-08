@@ -22,24 +22,35 @@ def wind_score(wind_speed, wind_gust):
 
 
 def temp_score(temp):
-    # Stepwise exponential decay (JS logic):
-    # <40: 0, 40-50: sharp rise, 50-60: moderate, 60-75: ideal, 75-85: mild, 85-95: moderate, 95-105: strong, >105: 0
+    # Temperature scoring using iOS widget logic with exponential decay for hot temperatures
+    # Extreme temperatures are more heavily punished
+    # Cold threshold: <40°F = 0, Hot threshold: >=105°F = 0
+    # Decay rates per segment: [0.02, 0.03, 0.09, 0.13, 0.280, 0.40]
     if temp is None:
         return 0.7
-    if temp < 40 or temp > 105:
+    if temp < 40 or temp >= 105:
         return 0
-    elif temp < 50:
-        return exp(-0.25 * (50 - temp))
-    elif temp < 60:
-        return exp(-0.08 * (60 - temp)) * exp(-0.25 * 10)
-    elif temp <= 75:
+    if temp <= 74:
         return 1.0
-    elif temp <= 85:
-        return exp(-0.08 * (temp - 75))
-    elif temp <= 95:
-        return exp(-0.15 * (temp - 85)) * exp(-0.08 * 10)
-    else:
-        return exp(-0.25 * (temp - 95)) * exp(-0.15 * 10) * exp(-0.08 * 10)
+    
+    # Temperature breakpoints and decay rates from iOS widget for hot temperatures
+    breakpoints = [74, 80, 85, 90, 95, 100, 105]
+    decay_rates = [0.02, 0.03, 0.09, 0.13, 0.280, 0.40]
+    
+    # Find which segment temp falls into
+    segment_score = 1.0
+    score = 1.0
+    
+    for i in range(len(breakpoints) - 1):
+        if temp <= breakpoints[i + 1]:
+            # Temperature is in this segment
+            score = segment_score * exp(-decay_rates[i] * (temp - breakpoints[i]))
+            break
+        else:
+            # Temperature exceeds this segment, propagate score to next
+            segment_score = segment_score * exp(-decay_rates[i] * (breakpoints[i + 1] - breakpoints[i]))
+    
+    return score
 
 
 def flow_score(flow):
@@ -237,24 +248,51 @@ def compute_rowcast(params):
         'safety': safety_alert_score(weather_alerts, visibility, lightning_potential, precip_prob, forecast_scores)
     }
 
-    # === GEOMETRIC MEAN SCORING SYSTEM ===
+    # === HYBRID SCORING SYSTEM ===
     # Zero out for immediate dangers
     if any(s == 0 for s in factors.values()):
         return {'score': 0, 'factors': factors}
 
-    # Calculate geometric mean
-    product = 1
-    for s in factors.values():
-        product *= s
+    # Categorize factors by danger level for hybrid scoring
+    factor_values = list(factors.values())
+    critical = [f for f in factor_values if f < 0.1]      # < 10% - critical danger
+    dangerous = [f for f in factor_values if 0.1 <= f < 0.3]  # 10-30% - dangerous
+    safe = [f for f in factor_values if f >= 0.3]              # >= 30% - safe/moderate
     
-    num_scores = len(factors)
-    if num_scores > 0:
-        base_score = product ** (1/num_scores)
+    if critical:
+        # Any critical factor = very low score (max 1.5/10)
+        base_score = min(factor_values) * 1.5
+    elif len(dangerous) >= 2:
+        # Multiple dangerous factors = use harmonic mean of dangerous + geometric of safe
+        if safe:
+            safe_score = 1
+            for f in safe:
+                safe_score *= f
+            safe_score = safe_score ** (1/len(safe))
+        else:
+            safe_score = 1
+        
+        # Harmonic mean for dangerous factors (more sensitive to low values)
+        danger_score = len(dangerous) / sum(1/f for f in dangerous)
+        base_score = danger_score * safe_score
+    elif dangerous:
+        # Single dangerous factor = weighted geometric mean (emphasize the danger)
+        product = 1
+        for f in factor_values:
+            if f in dangerous:
+                product *= f ** 1.5  # Weight dangerous factors more heavily
+            else:
+                product *= f
+        base_score = product ** (1/len(factor_values))
     else:
-        base_score = 0
+        # No dangerous factors = standard geometric mean
+        product = 1
+        for f in factor_values:
+            product *= f
+        base_score = product ** (1/len(factor_values))
 
     # Clamp and scale to 0-10
-    score = clamp(round(base_score * 10, 2), 0, 10)
+    score = clamp(round(base_score * 10, 3), 0, 10)
     return {'score': score, 'factors': factors}
 
 
