@@ -379,8 +379,11 @@ class WeatherManager {
                                                  data-hour-index="${hourIndex}">
                                                 <div class="text-xs text-glass-muted mb-1">${hourDisplay}</div>
                                                 <div class="text-sm font-medium mb-1">${Math.round(hour.currentTemp || 0)}°F</div>
-                                                <div class="text-xs text-blue-400 mb-1">${Math.round(hour.windSpeed || 0)} mph</div>
-                                                <div class="text-xs text-teal-400">${Math.round(hour.humidity || this.calculateHumidity(hour.currentTemp, hour.apparentTemp))}%</div>
+                                                <div class="text-xs space-y-1">
+                                                    <div class="text-blue-400">${Math.round(hour.windSpeed || 0)} mph</div>
+                                                    <div class="text-purple-400">${Math.round(hour.windGust || 0)} gust</div>
+                                                    <div class="text-teal-400">${Math.round(hour.humidity || this.calculateHumidity(hour.currentTemp, hour.apparentTemp))}%</div>
+                                                </div>
                                                 <i class="fas fa-${this.getWeatherIcon(hour)} text-lg text-center w-full mt-2"></i>
                                             </div>
                                         `;
@@ -541,21 +544,26 @@ class WeatherManager {
             ${hourData.windDir ? `<div class="mt-2 text-xs text-glass-muted">Wind Direction: <span class="text-blue-400">${hourData.windDir}</span></div>` : ''}
         `;
         
-        // Position tooltip
-        const rect = event.target.getBoundingClientRect();
+        // Position tooltip - find the hour item element
+        const hourItemElement = event.target.closest('.hour-item');
+        if (!hourItemElement) return;
+        
+        const rect = hourItemElement.getBoundingClientRect();
+        
+        // Show tooltip first to get its dimensions
+        tooltip.classList.remove('hidden');
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = rect.left + rect.width / 2 - 200 / 2; // Center horizontally
+        let left = rect.left + rect.width / 2 - tooltipRect.width / 2; // Center horizontally
         let top = rect.top - tooltipRect.height - 10; // Above the element
         
         // Adjust if tooltip would go off screen
         if (left < 10) left = 10;
-        if (left + 400 > window.innerWidth) left = window.innerWidth - 410;
+        if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
         if (top < 10) top = rect.bottom + 10; // Show below if no room above
         
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
-        tooltip.classList.remove('hidden');
         tooltip.dataset.activeHour = `${dayIndex}-${hourIndex}`;
     }
 

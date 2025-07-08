@@ -259,7 +259,7 @@ class DashboardManager {
         if (scoreElement && data.current && data.current.rowcast && data.current.rowcast.score !== undefined) {
             const score = data.current.rowcast.score;
             scoreElement.textContent = score.toFixed(1);
-            scoreElement.className = `text-6xl font-bold mb-4 ${this.getScoreColor(score)}`;
+            scoreElement.className = `text-6xl font-bold mb-4 rowcast-score-glow ${this.getScoreColor(score)}`;
             
             // Update score bar
             if (fillBar) {
@@ -396,12 +396,12 @@ class DashboardManager {
                     return `
                         <div class="widget-glass rounded-xl p-4 text-center">
                             <div class="text-sm text-glass-muted mb-2">${displayTime}</div>
-                            <div class="text-2xl font-bold mb-2 ${this.getScoreColor(score)}">${score.toFixed(1)}</div>
-                            <div class="text-xs text-glass-muted space-y-1">
-                                <div>${Math.round(conditions.discharge || 0)} cfs</div>
-                                <div>${Math.round(conditions.windGust || 0)} mph gusts</div>
-                                <div>${Math.round(conditions.windSpeed || 0)} mph wind</div>
-                                <div>${Math.round(conditions.apparentTemp || 0)}°F</div>
+                            <div class="text-2xl font-bold mb-3 rowcast-score-glow ${this.getScoreColor(score)}">${score.toFixed(1)}</div>
+                            <div class="text-xs space-y-1">
+                                <div class="text-red-400">${Math.round(conditions.apparentTemp || 0)}°F</div>
+                                <div class="text-blue-400">${Math.round(conditions.windSpeed || 0)} mph</div>
+                                <div class="text-purple-400">${Math.round(conditions.windGust || 0)} gust</div>
+                                <div class="text-teal-400">${Math.round(conditions.discharge || 0)} cfs</div>
                             </div>
                         </div>
                     `;
@@ -456,9 +456,13 @@ class DashboardManager {
                                                  onclick="window.dashboardManager.toggleRowcastTooltip(${index}, ${hourIndex}, event)"
                                                  data-hour-index="${hourIndex}">
                                                 <div class="text-xs text-glass-muted mb-1">${hourDisplay}</div>
-                                                <div class="text-lg font-bold mb-1 ${this.getScoreColor((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0)}">${((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0).toFixed(1)}</div>
-                                                <div class="text-xs text-blue-400 mb-1">${Math.round(hour.conditions.windSpeed || 0)} mph</div>
-                                                <div class="text-xs text-teal-400">${Math.round(hour.conditions.discharge || 0)} cfs</div>
+                                                <div class="text-lg font-bold mb-2 rowcast-score-glow ${this.getScoreColor((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0)}">${((hour.score && hour.score.score !== undefined) ? hour.score.score : hour.score || 0).toFixed(1)}</div>
+                                                <div class="text-xs space-y-1">
+                                                    <div class="text-red-400">${Math.round(hour.conditions.apparentTemp || 0)}°F</div>
+                                                    <div class="text-blue-400">${Math.round(hour.conditions.windSpeed || 0)} mph</div>
+                                                    <div class="text-purple-400">${Math.round(hour.conditions.windGust || 0)} gust</div>
+                                                    <div class="text-teal-400">${Math.round(hour.conditions.discharge || 0)} cfs</div>
+                                                </div>
                                             </div>
                                         `;
                                     }).join('')}
@@ -577,7 +581,7 @@ class DashboardManager {
                 hour12: true
             })}</div>
             <div class="text-center mb-3">
-                <div class="text-2xl font-bold ${this.getScoreColor((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0)}">${((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0).toFixed(1)}</div>
+                <div class="text-2xl font-bold rowcast-score-glow ${this.getScoreColor((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0)}">${((hourData.score && hourData.score.score !== undefined) ? hourData.score.score : hourData.score || 0).toFixed(1)}</div>
                 <div class="text-xs text-glass-muted">RowCast Score</div>
             </div>
             <div class="grid grid-cols-2 gap-3 text-xs">
@@ -624,21 +628,26 @@ class DashboardManager {
             ${conditions.weatherAlerts && conditions.weatherAlerts.length > 0 ? '<div class="mt-2 text-xs text-yellow-400">⚠ Weather alerts active</div>' : ''}
         `;
         
-        // Position tooltip
-        const rect = event.target.getBoundingClientRect();
+        // Position tooltip - find the hour item element
+        const hourItemElement = event.target.closest('.hour-item');
+        if (!hourItemElement) return;
+        
+        const rect = hourItemElement.getBoundingClientRect();
+        
+        // Show tooltip first to get its dimensions
+        tooltip.classList.remove('hidden');
         const tooltipRect = tooltip.getBoundingClientRect();
         
-        let left = rect.left + rect.width / 2 - 200 / 2; // Center horizontally
+        let left = rect.left + rect.width / 2 - tooltipRect.width / 2; // Center horizontally
         let top = rect.top - tooltipRect.height - 10; // Above the element
         
         // Adjust if tooltip would go off screen
         if (left < 10) left = 10;
-        if (left + 400 > window.innerWidth) left = window.innerWidth - 410;
+        if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 10;
         if (top < 10) top = rect.bottom + 10; // Show below if no room above
         
         tooltip.style.left = `${left}px`;
         tooltip.style.top = `${top}px`;
-        tooltip.classList.remove('hidden');
         tooltip.dataset.activeHour = `${dayIndex}-${hourIndex}`;
     }
 

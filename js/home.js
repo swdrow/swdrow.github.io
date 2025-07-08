@@ -200,7 +200,7 @@ class HomeManager {
         const scoreElement = document.getElementById('current-score');
         if (scoreElement && data.current && data.current.rowcast && data.current.rowcast.score !== undefined) {
             scoreElement.textContent = data.current.rowcast.score.toFixed(1);
-            scoreElement.className = `text-3xl font-bold mb-2 ${this.getScoreColor(data.current.rowcast.score)}`;
+            scoreElement.className = `text-3xl font-bold mb-2 rowcast-score-glow ${this.getScoreColor(data.current.rowcast.score)}`;
         }
 
         // Update temperature
