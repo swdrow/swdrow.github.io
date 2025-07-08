@@ -5,6 +5,7 @@ import json
 import os
 from datetime import datetime, timedelta
 import pytz
+import logging
 # Import the redis_client instance from the extensions file
 from app.extensions import redis_client
 from app.rowcast import compute_rowcast, merge_params
@@ -278,14 +279,28 @@ def rowcast_forecast_extended_simple():
 def complete_extended():
     """Returns all data including extended forecasts for comprehensive dashboard."""
     try:
+        logging.info("Attempting to fetch complete extended data.")
         # Get all data sources
         weather_data = get_data_from_redis('weather_data')
+        logging.info(f"Weather data fetched: {'found' if weather_data else 'not found'}")
+        
         extended_weather_data = get_data_from_redis('extended_weather_data')
+        logging.info(f"Extended weather data fetched: {'found' if extended_weather_data else 'not found'}")
+        
         water_data = get_data_from_redis('water_data')
+        logging.info(f"Water data fetched: {'found' if water_data else 'not found'}")
+        
         noaa_stageflow_data = get_data_from_redis('noaa_stageflow_data')
+        logging.info(f"NOAA stageflow data fetched: {'found' if noaa_stageflow_data else 'not found'}")
+        
         forecast_scores = get_data_from_redis('forecast_scores')
+        logging.info(f"Forecast scores fetched: {'found' if forecast_scores else 'not found'}")
+        
         extended_forecast_scores = get_data_from_redis('extended_forecast_scores')
+        logging.info(f"Extended forecast scores fetched: {'found' if extended_forecast_scores else 'not found'}")
+        
         short_term_forecast = get_data_from_redis('short_term_forecast')
+        logging.info(f"Short term forecast fetched: {'found' if short_term_forecast else 'not found'}")
         
         response = {
             'weather': {
@@ -327,6 +342,7 @@ def complete_extended():
         
         # Calculate current rowcast if we have current data
         if weather_data and weather_data.get('current'):
+            logging.info("Calculating current rowcast.")
             current_water = water_data.get('current') if water_data else {}
             noaa_current = noaa_stageflow_data.get('current') if noaa_stageflow_data else {}
             
@@ -354,10 +370,15 @@ def complete_extended():
                 'timestamp': weather_data['current'].get('timestamp'),
                 'noaaDataUsed': noaa_current.get('discharge') is not None or noaa_current.get('gaugeHeight') is not None
             }
+            logging.info("Current rowcast calculated successfully.")
+        else:
+            logging.warning("Could not calculate current rowcast due to missing current weather data.")
         
+        logging.info("Successfully compiled extended data response.")
         return jsonify(response)
         
     except Exception as e:
+        logging.error(f"Error in /api/complete/extended: {str(e)}", exc_info=True)
         return jsonify({"error": f"Failed to compile extended data: {str(e)}"}), 500
 
 @bp.route("/api")

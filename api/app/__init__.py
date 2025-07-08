@@ -1,6 +1,6 @@
 # app/__init__.py
-
-from flask import Flask
+import logging
+from flask import Flask, request
 from flask_cors import CORS
 # Import instances from our new extensions file
 from app.extensions import scheduler, redis_client
@@ -14,6 +14,23 @@ def create_app():
     """
     app = Flask(__name__)
     
+    # --- Logging ---
+    # Set up basic logging
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
+    
+    # Log all incoming requests
+    @app.before_request
+    def log_request_info():
+        app.logger.info('Headers: %s', request.headers)
+        app.logger.info('Body: %s', request.get_data())
+
+    # Log all responses
+    @app.after_request
+    def log_response_info(response):
+        app.logger.info('Response: %s', response.get_data())
+        return response
+
     # Enable CORS for all routes
     # Allow localhost for development and production domains
     allowed_origins = [
