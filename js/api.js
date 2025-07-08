@@ -1,7 +1,9 @@
 // API Documentation Page Manager
 class ApiManager {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:5000/api';
+        this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:5000/api' 
+            : 'https://api.samwduncan.com/api';
         this.isInitialized = false;
         this.endpoints = [
             {

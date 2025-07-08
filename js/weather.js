@@ -1,7 +1,9 @@
 // Weather Page Manager
 class WeatherManager {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:5000/api';
+        this.apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:5000/api' 
+            : 'https://api.samwduncan.com/api';
         this.currentForecastType = '12hour';
         this.weatherRadarWidget = null;
         this.windMapWidget = null;
