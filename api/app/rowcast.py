@@ -29,7 +29,7 @@ def temp_score(temp):
     if temp is None:
         return 0.7
     if temp < 40 or temp >= 105:
-        return 0
+        return 0.0
     if temp <= 74:
         return 1.0
     
@@ -37,7 +37,7 @@ def temp_score(temp):
     breakpoints = [74, 80, 85, 90, 95, 100, 105]
     decay_rates = [0.02, 0.03, 0.09, 0.13, 0.280, 0.40]
     
-    # Find which segment temp falls into
+    # Calculate exponential decay for hot temperatures
     segment_score = 1.0
     score = 1.0
     
