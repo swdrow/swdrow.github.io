@@ -231,3 +231,41 @@ MIT License - see LICENSE file for details
 ---
 
 Built with ❤️ for the rowing community on the Schuylkill River
+
+## 🔧 System Administration
+
+This repository also includes comprehensive system administration documentation and tools:
+
+### Nextcloud & ZFS Troubleshooting
+
+Located in `docs/sysadmin/`, this documentation provides:
+
+- **[ZFS Troubleshooting Guide](docs/sysadmin/zfs-troubleshooting.md)** - Complete guide for diagnosing and fixing ZFS pool issues
+- **[Nextcloud Migration Guide](docs/sysadmin/nextcloud-migration.md)** - Step-by-step procedures for migrating Nextcloud data directories
+- **[Emergency Recovery Procedures](docs/sysadmin/emergency-recovery.md)** - Critical procedures for system recovery
+- **[Comprehensive Troubleshooting Manual](docs/sysadmin/troubleshooting-guide.md)** - Specific procedures for suspended ZFS pools and Nextcloud issues
+
+### Administrative Scripts
+
+The `docs/sysadmin/scripts/` directory contains:
+
+- **`zfs-diagnostics.sh`** - Automated ZFS pool health diagnostics
+- **`nextcloud-management.sh`** - Comprehensive Nextcloud service management
+- **`emergency-recovery.sh`** - Quick recovery script for immediate issues
+
+### Quick Emergency Recovery
+
+If you're experiencing a suspended ZFS pool with Nextcloud down:
+
+```bash
+# Run the emergency recovery script
+sudo docs/sysadmin/scripts/emergency-recovery.sh
+
+# For detailed diagnostics
+sudo docs/sysadmin/scripts/zfs-diagnostics.sh storage
+
+# For Nextcloud management
+sudo docs/sysadmin/scripts/nextcloud-management.sh health
+```
+
+**Important**: Do not add drives to a suspended or unhealthy ZFS pool. Always resolve pool issues first.
