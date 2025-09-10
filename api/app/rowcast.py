@@ -22,10 +22,10 @@ def wind_score(wind_speed, wind_gust):
 
 
 def temp_score(temp):
-    # Temperature scoring using iOS widget logic with exponential decay for hot temperatures
-    # Extreme temperatures are more heavily punished
+    # Temperature scoring with smooth continuous decay for hot temperatures
+    # Eliminates abrupt transitions by using temperature-dependent exponential rate
     # Cold threshold: <40°F = 0, Hot threshold: >=105°F = 0
-    # Decay rates per segment: [0.02, 0.03, 0.09, 0.13, 0.280, 0.40]
+    # Targets: 85-90°F ≈ 5-6 score, 100-105°F < 1 score
     if temp is None:
         return 0.7
     if temp < 40 or temp >= 105:
@@ -33,24 +33,18 @@ def temp_score(temp):
     if temp <= 74:
         return 1.0
     
-    # Temperature breakpoints and decay rates from iOS widget for hot temperatures
-    breakpoints = [74, 80, 85, 90, 95, 100, 105]
-    decay_rates = [0.02, 0.03, 0.09, 0.13, 0.280, 0.40]
+    # Smooth exponential decay with temperature-dependent rate
+    # Rate increases smoothly with temperature for natural curve
+    t = temp - 74  # Temperature above 74°F
     
-    # Calculate exponential decay for hot temperatures
-    segment_score = 1.0
-    score = 1.0
+    # Dynamic rate that increases smoothly with temperature
+    # Lower rate at moderate temps, higher rate at extreme temps
+    base_rate = 0.019
+    rate_multiplier = 1 + (t / 31) ** 2.3 * 7.5  # Smooth acceleration
+    dynamic_rate = base_rate * rate_multiplier
     
-    for i in range(len(breakpoints) - 1):
-        if temp <= breakpoints[i + 1]:
-            # Temperature is in this segment
-            score = segment_score * exp(-decay_rates[i] * (temp - breakpoints[i]))
-            break
-        else:
-            # Temperature exceeds this segment, propagate score to next
-            segment_score = segment_score * exp(-decay_rates[i] * (breakpoints[i + 1] - breakpoints[i]))
-    
-    return score
+    score = exp(-dynamic_rate * t)
+    return max(0, score)
 
 
 def flow_score(flow):
@@ -248,49 +242,51 @@ def compute_rowcast(params):
         'safety': safety_alert_score(weather_alerts, visibility, lightning_potential, precip_prob, forecast_scores)
     }
 
-    # === HYBRID SCORING SYSTEM ===
-    # Zero out for immediate dangers
-    if any(s == 0 for s in factors.values()):
-        return {'score': 0, 'factors': factors}
-
-    # Categorize factors by danger level for hybrid scoring
-    factor_values = list(factors.values())
-    critical = [f for f in factor_values if f < 0.1]      # < 10% - critical danger
-    dangerous = [f for f in factor_values if 0.1 <= f < 0.3]  # 10-30% - dangerous
-    safe = [f for f in factor_values if f >= 0.3]              # >= 30% - safe/moderate
+    # === WEIGHTED SCORING SYSTEM ===
+    # Temperature and wind are primary factors, others are secondary modifiers
     
-    if critical:
-        # Any critical factor = very low score (max 1.5/10)
-        base_score = min(factor_values) * 1.5
-    elif len(dangerous) >= 2:
-        # Multiple dangerous factors = use harmonic mean of dangerous + geometric of safe
-        if safe:
-            safe_score = 1
-            for f in safe:
-                safe_score *= f
-            safe_score = safe_score ** (1/len(safe))
+    # 1. Critical safety override - can cause immediate 0 or very low scores
+    if factors['safety'] == 0:
+        return {'score': 0, 'factors': factors}
+    elif factors['safety'] < 0.1:
+        # Critical safety issue - override everything with very low score
+        return {'score': round(factors['safety'] * 10, 3), 'factors': factors}
+    
+    # 2. Primary score calculation (temperature 80%, wind 20%)
+    # Adjust weighting to reduce wind's positive impact
+    primary_score = (factors['temp'] * 0.8) + (factors['wind'] * 0.2)
+    
+    # 3. Secondary factors as modifiers (flow, precip, water_temp, uv)
+    # These can reduce the score but have limited impact unless critical
+    secondary_factors = {
+        'flow': factors['flow'],
+        'precip': factors['precip'], 
+        'water_temp': factors['water_temp'],
+        'uv': factors['uv']
+    }
+    
+    # Apply secondary factor modifiers
+    secondary_modifier = 1.0
+    for factor_value in secondary_factors.values():
+        if factor_value == 0:
+            # Secondary factor is critical - significant impact
+            secondary_modifier *= 0.1
+        elif factor_value < 0.3:
+            # Secondary factor is problematic - moderate impact
+            secondary_modifier *= (0.7 + (factor_value * 0.3))  # Scale from 0.7 to 1.0
         else:
-            safe_score = 1
-        
-        # Harmonic mean for dangerous factors (more sensitive to low values)
-        danger_score = len(dangerous) / sum(1/f for f in dangerous)
-        base_score = danger_score * safe_score
-    elif dangerous:
-        # Single dangerous factor = weighted geometric mean (emphasize the danger)
-        product = 1
-        for f in factor_values:
-            if f in dangerous:
-                product *= f ** 1.5  # Weight dangerous factors more heavily
-            else:
-                product *= f
-        base_score = product ** (1/len(factor_values))
+            # Secondary factor is okay - minimal impact
+            secondary_modifier *= (0.85 + (factor_value * 0.15))  # Scale from 0.85 to 1.0
+    
+    # 4. Apply safety modifier (if not critical)
+    if factors['safety'] < 0.3:
+        safety_modifier = 0.5 + (factors['safety'] * 0.5)  # Scale from 0.5 to 1.0
     else:
-        # No dangerous factors = standard geometric mean
-        product = 1
-        for f in factor_values:
-            product *= f
-        base_score = product ** (1/len(factor_values))
-
+        safety_modifier = 0.90 + (factors['safety'] * 0.10)  # Scale from 0.90 to 1.0
+    
+    # 5. Calculate final score
+    base_score = primary_score * secondary_modifier * safety_modifier
+    
     # Clamp and scale to 0-10
     score = clamp(round(base_score * 10, 3), 0, 10)
     return {'score': score, 'factors': factors}
